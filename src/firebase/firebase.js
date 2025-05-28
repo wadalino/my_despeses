@@ -110,4 +110,11 @@ export const logoutUser = async () => {
 }
 
 
+// crear metodo per comprovar si tenim un usuari autenticat
+export const loginState = (callback) => {
+  return auth.onAuthStateChanged(callback);
+}
+
+
+
 

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 
 import { loginUser, logoutUser } from '../../firebase/firebase';
-import { Navigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 
 
 export default function Login() {
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
 
   const resetForm = () => {
     setUser("");
@@ -22,7 +24,9 @@ export default function Login() {
 
     if (res.code == undefined) {
       console.log("User logged in successfully:", res.user.uid);
+      //userLoggedIn = true; // Assuming you have a state to track user login status
       // Navigate - Here you might want to redirect the user or show a success message
+      return <Navigate to="/" replace />;
       
     } else {
       console.error("Error logging in user:", res.code, res.message);
@@ -31,22 +35,6 @@ export default function Login() {
     }
 
     resetForm();
-  }
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    // Implement logout functionality here
-    // For example, you can use signOut(auth) from Firebase Auth
-
-    logoutUser().then(() => {
-      // Sign-out successful.
-      console.log("User logged out successfully now navigating to login page");
-    }).catch((error) => {
-      // An error happened.
-      console.error("Error logging out user:", error);
-    });
-
-    return <Navigate to="/login" replace />;
-    
   }
   
   return (
@@ -61,7 +49,7 @@ export default function Login() {
               <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} />
           </label>
           <button>Login</button>
-          <button onClick={handleLogout}>Logout</button>
+
       </form>
 
   )
