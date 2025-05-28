@@ -15,6 +15,8 @@ function App() {
           <Route path='/' element={<Inici />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
+          {/* FIXME Inici should be projectes */}
+          <Route path='/projectes' element={<Inici />} />
           <Route path='/despesa/:id' element={<DespesesDetall />} />
           <Route path='*' element={<Navigate to="/" replace />} />
         </Routes>

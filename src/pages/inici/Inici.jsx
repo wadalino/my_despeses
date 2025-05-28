@@ -49,7 +49,7 @@ export default function Inici() {
     const eliminarDespesa = (id) => {
          //setDespeses((despesesPrevies) => {
 
-             deleteDespesa(id)
+             deleteDespesa(id);
 
          //})
     }

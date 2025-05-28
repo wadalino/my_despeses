@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { registerUser, saveCollection } from '../../firebase/firebase';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Register() {
@@ -8,6 +10,8 @@ export default function Register() {
     const [password, setPassword] = useState("");
     const [passwordVerify, setPasswordVerify] = useState("");
 
+    const navigate = useNavigate();
+
     const resetForm = () => {
         setMail("");
         setUserName("");
@@ -15,7 +19,7 @@ export default function Register() {
         setPasswordVerify("");
     }
     
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== passwordVerify) {
             alert("Passwords do not match!");
@@ -24,6 +28,28 @@ export default function Register() {
         console.log("E-Mail:", mail);
         console.log("Username:", userName);
         console.log("Password:", password);
+
+        const res = await registerUser(mail, password);
+
+        if(res.code == undefined) {
+            console.log("User registered successfully:", res.user.uid);
+            saveCollection("participants", {
+                email: mail,
+                username: userName,
+                uid: res.user.uid
+            }).then((user) => {
+                console.log("Participant saved with ID:", user.id, user.username, user.email);
+            });
+        } else {
+            StorageError(res.message)
+            // console.error("Error registering user:", res.code, res.message);
+            // alert("Error registering user: " + res.message);
+            return;
+        }
+
+        console.log("User registered:", res);
+        // Here you might want to redirect the user or show a success message
+        navigate("/projectes");
         resetForm();
     }   
 
