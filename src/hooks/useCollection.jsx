@@ -19,3 +19,4 @@ export const useCollection = (collectionName)=>{
 
     return {documents};
 }
+export default useCollection

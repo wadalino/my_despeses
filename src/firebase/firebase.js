@@ -3,17 +3,17 @@ import { firebaseConfig } from "./config"
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
 import { getFirestore, addDoc, collection, getDocs, onSnapshot, doc, deleteDoc } from "firebase/firestore"
-import {createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth'; 
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth'; 
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 
 // Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
+export const auth = getAuth(app);
 
 export const saveDespesa = async (despesa) => {
   console.log(despesa);
@@ -21,7 +21,7 @@ export const saveDespesa = async (despesa) => {
 
   return docRef.id;   
 }
-
+  
 export const saveCollection = async (collectionName, document) => {
   console.log(document);
   const docRef = await addDoc(collection(db, collectionName), document);
@@ -29,7 +29,7 @@ export const saveCollection = async (collectionName, document) => {
   return docRef.id;   
 }
 
-
+/* DESPESA FUNCTIONS */
 export const getDespeses = () => 
   getDocs(collection(db, "despeses"));
 
@@ -41,6 +41,17 @@ export const onGetDespesa = (id, callback) =>
 
 export const deleteDespesa = async (id) => {
   deleteDoc(doc(db, "despeses", id));
+}
+
+/* PROJECT FUNCTIONS */
+export const getProjectes = () => 
+  getDocs(collection(db, "projectes"));
+
+export const onGetProjecte = (id, callback) =>
+  onSnapshot(doc(db, "projectes", id), callback);
+
+export const deleteProjecte = async (id) => {
+  deleteDoc(doc(db, "projectes", id));
 }
 
 
@@ -115,6 +126,12 @@ export const loginState = (callback) => {
   return auth.onAuthStateChanged(callback);
 }
 
-
+export const getCurrentUser = () => {
+  return auth.currentUser;
+}
+export const getUserId = () => {
+  const user = getCurrentUser();
+  return user ? user.uid : null;
+}
 
 

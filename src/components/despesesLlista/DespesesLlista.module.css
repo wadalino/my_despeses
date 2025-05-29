@@ -1,8 +1,13 @@
 .targeta {
-    border: 1px solid #eee;
-    box-shadow: 4px 4px 5px rgba(0,0,0,0.05);
+    border: 1px solid #6d6d6d;
+    box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.65);
     padding: 10px;
     max-width: 400px;
     margin: 20px auto;
-    border-radius: 4px;
+    border-radius: 0.25rem;
+    
+}
+
+.targeta button {
+    margin: 2px;
 }

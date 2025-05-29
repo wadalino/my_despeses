@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import './DespesaForm.css';
+import '../despesaForm/DespesaForm.css';
 import useCollection from '../../hooks/useCollection'; // ajusta la ruta
 
-export default function DespesaForm({ 
+export default function ProjecteForm({ 
   user, 
-  afegirDespesa, 
-  actualitzarDespesa,
-  despesa 
+  afegirProjecte, 
+  actualitzarProjecte,
+  projecte 
 }) {
-  const [concepte, setConcepte] = useState('');
-  const [quantia, setQuantia] = useState('');
-  const [pagatPer, setPagatPer] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [owner, setOwner] = useState('');
   const [participants, setParticipants] = useState([]);
 
   const { documents: allParticipants, loading } = useCollection('participants');
@@ -18,36 +18,36 @@ export default function DespesaForm({
   // com empram es mateix form per afegir i actualitzar,
   // si hi ha una despesa, carregam ses dades
   useEffect(() => {
-    if (despesa) {
-      setConcepte(despesa.concepte || 'no especificat');
-      setQuantia(despesa.quantia.toString() || 0);
-      setPagatPer(despesa.pagatPer || user?.uid);
-      setParticipants(despesa.participants || [user?.uid]);
+    if (projecte) {
+      setName(projecte.name || 'no especificat');
+      setDescription(projecte.description || 'no especificat');
+      setOwner(projecte.owner || user?.uid);
+      setParticipants(projecte.participants || [user?.uid]);
     } else {
       resetForm();
     }
-  }, [despesa, user]);
+  }, [projecte, user]);
 
 
   const resetForm = () => {
-    setConcepte('');
-    setQuantia('');
-    setPagatPer('');
+    setName('');
+    setDescription('');
+    setOwner('');
     setParticipants([]);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const despesa = {
-      concepte,
-      quantia: parseFloat(quantia),
-      pagatPer: pagatPer || user?.uid,
+    const projecte = {
+      name,
+      description,
+      owner,
       participants,
-      createdAt: new Date(),
+      modified: new Date(),
     };
 
-    afegirDespesa(despesa);
+    afegirProjecte(projecte);
     resetForm();
   };
 
@@ -56,30 +56,29 @@ export default function DespesaForm({
     setParticipants(selected);
   };
 
-  console.log("DespesaForm: ", despesa);
+  console.log("ProjecteForm projecte: ", projecte);
   return (
     <form className='despesa-form' onSubmit={handleSubmit}>
       <label>
-        <span>Concepte</span>
+        <span>Nom del projecte</span>
         <input
           type='text'
-          onChange={(e) => setConcepte(e.target.value)}
-          value={concepte}
+          onChange={(e) => setName(e.target.value)}
+          value={name}
         />
       </label>
       <label>
-        <span>Quantia (€)</span>
+        <span>Descripció</span>
         <input
-          type='number'
-          step='0.01'
-          onChange={(e) => setQuantia(e.target.value)}
-          value={quantia}
+          type='text'
+          onChange={(e) => setDescription(e.target.value)}
+          value={description}
         />
       </label>
 
       <label>
-        <span>Pagat per</span>
-        <select onChange={(e) => setPagatPer(e.target.value)} value={pagatPer}>
+        <span>Owner</span>
+        <select onChange={(e) => setOwner(e.target.value)} value={owner}>
           <option value="">-- Selecciona --</option>
           {allParticipants?.map(p => (
             <option key={p.uid} value={p.uid}>{p.username}</option>
@@ -97,7 +96,7 @@ export default function DespesaForm({
       </label>
 
       <button disabled={loading}>
-        {despesa ? 'Actualitzar' : 'Afegir'}
+        {projecte ? 'Actualitzar' : 'Afegir'}
       </button>
     </form>
   );

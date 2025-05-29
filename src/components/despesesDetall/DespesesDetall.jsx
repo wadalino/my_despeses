@@ -1,32 +1,64 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'
-import { onGetDespesa } from '../../firebase/firebase'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { onGetDespesa } from '../../firebase/firebase';
+import './DespesesDetall.css';
+import useUsernameByUid from '../../hooks/useUsernameByUid';
+import useParticipantsMap from '../../hooks/useParticipantsMap';
 
-export default function DespesesDetall() {
+export default function DespesesDetall({ id: propId }) {
+  const { id: paramId } = useParams();
+  const id = propId || paramId;
 
-    const { id } = useParams();
-    const [despesa, setDespesa] = useState(null);
+  const [despesa, setDespesa] = useState(null);
 
-    useEffect(()=> {
-        const unsubscribe = onGetDespesa(id, (docSnap)=> {
-            if(docSnap.exists()) {
-                setDespesa({...docSnap.data(), id:docSnap.id})
-            } else {
-                setDespesa(null);
-            }
-        });
-        return ()=> unsubscribe();
-    }, [id]);
+  useEffect(() => {
+    const unsubscribe = onGetDespesa(id, (docSnap) => {
+      if (docSnap.exists()) {
+        setDespesa({ ...docSnap.data(), id: docSnap.id });
+      } else {
+        setDespesa(null);
+      }
+    });
+    return () => unsubscribe();
+  }, [id]);
 
-    if(!despesa) return <p>Despesa no trobada...</p>
+  // Crida dels hooks SEMPRE, independentment de l'estat de despesa
+  const { username: usernamePagador, loading: loadingPagador } = useUsernameByUid(despesa?.pagatPer);
+  const { participantsMap, loading: loadingParticipants } = useParticipantsMap();
+
+  const nomsParticipants = despesa?.participants
+    ?.map(uid => participantsMap.get(uid) || uid)
+    .join(', ');
+
+  if (!despesa) return <p>Despesa no trobada...</p>;
 
   return (
-    <div>
-        <h2>Detall de la despesa</h2>
-        <p><strong>Concepte:</strong>{despesa.concepte}</p>
-        <p><strong>Quantia:</strong>{despesa.quantia}€</p>
-        <p><strong>Pagar per:</strong>{despesa.pagatPer}</p>
+    <div className='despesa-detall'>
+      <h2 className='despesa-detall__title'>Detall de la despesa</h2>
+
+      <p className='despesa-detall__item'>
+        <strong>Concepte:</strong> {despesa.concepte}
+      </p>
+
+      <p className='despesa-detall__item'>
+        <strong>Quantia:</strong> {despesa.quantia}€
+      </p>
+
+      <p className='despesa-detall__item'>
+        <strong>Pagar per:</strong> {loadingPagador ? 'Carregant...' : usernamePagador || despesa.pagatPer}
+      </p>
+
+      <p className='despesa-detall__item'>
+        <strong>Participants:</strong> {loadingParticipants ? 'Carregant...' : nomsParticipants || 'Cap'}
+      </p>
+
+      <p className='despesa-detall__item'>
+        <strong>Preu per participant:</strong> {
+          despesa.participants?.length
+            ? (despesa.quantia / despesa.participants.length).toFixed(2)
+            : despesa.quantia
+        }
+      </p>
     </div>
-  )
+  );
 }

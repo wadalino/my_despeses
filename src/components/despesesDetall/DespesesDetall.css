@@ -1,0 +1,14 @@
+.despesa-detall {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.despesa-detall__title {
+    color: #bfc6d3;
+}
+
+.despesa-detall__item {
+    margin: 5px 0;
+}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { loginUser, logoutUser } from '../../firebase/firebase';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { loginUser } from '../../firebase/firebase';
+import { useNavigate} from 'react-router-dom';
 
 
 export default function Login() {
@@ -15,26 +15,27 @@ export default function Login() {
     setUser("");
     setPassword("");
   }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User:", user);
-    console.log("Password:", password);
+    // console.log("User:", user);
+    //console.log("Password:", password);
 
     const res = await loginUser(user, password);
 
     if (res.code == undefined) {
       console.log("User logged in successfully:", res.user.uid);
+      resetForm();
       //userLoggedIn = true; // Assuming you have a state to track user login status
-      // Navigate - Here you might want to redirect the user or show a success message
-      return <Navigate to="/" replace />;
-      
+      // no utilitzam Navigate perque no esteim dins d'un component de React Router
+      return navigate("/");
+
     } else {
       console.error("Error logging in user:", res.code, res.message);
       alert("Error logging in user: " + res.message);
       return;
     }
 
-    resetForm();
   }
   
   return (
