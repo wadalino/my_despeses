@@ -1,0 +1,22 @@
+.modalDespeses {
+  max-height: 80vh;
+  min-width: 600px;
+  overflow-y: auto;
+  background: #646464;
+  border-radius: 30px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.modalDespeses-fons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+     height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

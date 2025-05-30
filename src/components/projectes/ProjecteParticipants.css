@@ -1,0 +1,57 @@
+.participants-modal {
+  padding: 0.2rem;
+}
+
+.participants-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.participant-label {
+  background-color: #414141;
+  padding: 0.1rem 0.2rem 0.1rem 0.6rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  border: 1px solid #ccc;
+}
+
+.participant-label button {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: red;
+}
+
+.participant-inputs label {
+  display: block;
+  margin-top: 1rem;
+}
+
+.participant-inputs input,
+.participant-inputs select {
+  margin-left: 0.5rem;
+  padding: 0.3rem;
+}
+
+.guardar-container {
+  margin-top: 1.5rem;
+  text-align: right;
+}
+
+.guardar-button {
+  padding: 0.5rem 1rem;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.guardar-button:hover {
+  background-color: #005fa3;
+}

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { onGetProjecte, deleteProjecte } from '../../firebase/firebase';
-import '../despesesDetall/DespesesDetall.css';
 import useUsernameByUid from '../../hooks/useUsernameByUid';
 import useParticipantsMap from '../../hooks/useParticipantsMap';
+
+import '../despesesDetall/DespesesDetall.css';
 
 export default function ProjectesDetall({ id: propId }) {
   const { id: paramId } = useParams();

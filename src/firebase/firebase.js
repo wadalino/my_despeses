@@ -2,7 +2,7 @@ import { firebaseConfig } from "./config"
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
-import { getFirestore, addDoc, collection, getDocs, onSnapshot, doc, deleteDoc } from "firebase/firestore"
+import { getFirestore, addDoc, collection, getDocs, onSnapshot, doc, deleteDoc, updateDoc } from "firebase/firestore"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth'; 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -53,6 +53,31 @@ export const onGetProjecte = (id, callback) =>
 export const deleteProjecte = async (id) => {
   deleteDoc(doc(db, "projectes", id));
 }
+
+export const getDespesesPerProjecte = async (projecteId) => {
+  try {
+    const q = query(collection(db, "despeses"), where("projecteId", "==", projecteId));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error obtenint despeses per projecte:", error);
+    throw error;
+  }
+}
+
+export const updateProjecteParticipants = async (projecteId, newParticipants) => {
+  try {
+    const ref = doc(db, "projectes", projecteId);
+    await updateDoc(ref, { participants: newParticipants });
+    console.log("Participants actualitzats correctament per al projecte", projecteId);
+  } catch (error) {
+    console.error("Error actualitzant participants:", error);
+    throw error;
+  }
+};
 
 
 /* Auth funcions */

@@ -15,7 +15,7 @@ function App() {
     <div>
       <Navbar />
         <Routes>
-          <Route path='/' element={<Inici />} />
+          <Route path='/' element={<Projectes />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
           {/* FIXME Inici should be projectes */}

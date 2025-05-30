@@ -9,8 +9,10 @@ import {
 import { auth, db } from '../../firebase/firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import Despeses from '../despeses/Despeses.jsx';
+import DespesesLlista from '../../components/despesesLlista/DespesesLlista.jsx';
 import { useCollection } from '../../hooks/useCollection.jsx';
 import ProjectesLlista from '../../components/projectes/ProjectesLlista.jsx';
+import ProjecteForm from '../../components/projectes/ProjecteForm.jsx';
 
 export default function Projectes() {
   const [user, setUser] = useState(null);
@@ -18,7 +20,7 @@ export default function Projectes() {
   const [nomProjecte, setNomProjecte] = useState("");
   const [descripcio, setDescripcio] = useState("");
   const [editMode, setEditMode] = useState(false);
-  const { documents: projectes } = useCollection('projectes');
+  const {documents: projectes} = useCollection('projectes');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -73,37 +75,10 @@ export default function Projectes() {
       {Array.isArray(projectes) && projectes.length > 0 && (
         <ProjectesLlista projectes={projectes.filter(p => p.owner === user.uid)} />
       )}
-
+      { /*
       {projecte ? (
         <div>
-          {editMode ? (
-            <div>
-              <label>
-                Nom:
-                <input
-                  type="text"
-                  value={nomProjecte}
-                  onChange={(e) => setNomProjecte(e.target.value)}
-                />
-              </label>
-              <label>
-                Descripció:
-                <textarea
-                  value={descripcio}
-                  onChange={(e) => setDescripcio(e.target.value)}
-                />
-              </label>
-              <button onClick={updateProjecte}>Desar canvis</button>
-              <button onClick={() => setEditMode(false)}>Cancel·la</button>
-            </div>
-          ) : (
-            <div>
-              <h3>{projecte.name}</h3>
-              <p>{projecte.description}</p>
-              <button onClick={() => setEditMode(true)}>Editar projecte</button>
-            </div>
-          )}
-          { /* <Despeses idProjecte={projecte.id} /> */ }
+          <ProjecteForm idProjecte={projecte.id} />
         </div>
       ) : (
         <div>
@@ -124,7 +99,8 @@ export default function Projectes() {
           </label>
           <button onClick={crearProjecte}>Crear projecte</button>
         </div>
-      )}
+      )} 
+      */ }
     </div>
   );
 }

@@ -7,11 +7,24 @@ import DespesaForm from '../../components/despesaForm/DespesaForm';
 import { onGetCollection, deleteDespesa, saveDespesa } from '../../firebase/firebase';
 import { useCollection } from '../../hooks/useCollection';
 
-export default function Despeses() {
+export default function Despeses(props) {
+    if (!props) {
+        //console.log ("No hi ha projecte o usuari autenticat.", 
+        //    "\nprojecte",props.projecte, 
+        //    "usuariAutenticat", props.usuariAutenticat);
+        return <div>No hi ha projecte o usuari autenticat.</div>;
+    }
+    const { projecte, usuariAutenticat } = props;
+    //console.log("Despeses (usuari):", getAuth().currentUser?.uid);
+    //console.log("Despeses (usuari):", usuariAutenticat); 
+    // const [user, setUser] = useState(usuariAutenticat);
     const [mostraModal, setMostraModal] = useState(false);
     // const [despeses, setDespeses] = useState(null);
 
     const { documents: despeses } = useCollection('despeses');
+    
+    const projecteId = projecte?.id || null; // si no té projecte, es deixa a null
+    // const projecte = projecte || null; // si no té projecte, es deixa a null
 
     // useEffect(() => {
     //     const unsubscribe = onGetCollection("despeses", (querySnapshot) => {
@@ -33,14 +46,9 @@ export default function Despeses() {
         saveDespesa(despesa)
             .then((idDespesa) => {
                 despesa.id = idDespesa;
+                despesa.projecteId = projecteId || null; // si no té projecte, es deixa a null
                 return [despesa];
             });
-            /*
-            .then((novesDespeses) => {
-                setDespeses((despesesPrevies) => {
-                    return [...despesesPrevies, ...novesDespeses];
-                });
-            });*/
         setMostraModal(false);
     };
 
@@ -52,18 +60,19 @@ export default function Despeses() {
         setMostraModal(false);
     }
 
-    console.log("Despeses:", despeses);
-    console.log("Username:", localStorage.getItem('user'));
+    
+    //console.log("Despeses Projecte (nom):", projecte.name);
+    //console.log("Despeses Projecte (id):", usuariAutenticat);
     return (
         <div>
-            <h1>Inici</h1>
-            {despeses && <DespesesLlista despeses={despeses} eliminarDespesa={eliminarDespesa} />}
-            {mostraModal && <Modal handleTancar={handleTancar} esVorera={"tancar"}>
-                <DespesaForm afegirDespesa={afegirDespesa} />
-            </Modal>}
             <div>
                 <button onClick={() => setMostraModal(true)}>Afegir Despesa</button>
             </div>
+            {despeses && <DespesesLlista despeses={despeses} eliminarDespesa={eliminarDespesa} projecte={projecte}/>}
+            {mostraModal && <Modal handleTancar={handleTancar} esVorera={"tancar"}>
+                <DespesaForm afegirDespesa={afegirDespesa} usuariAutenticat={usuariAutenticat} projecte={projecte} />
+            </Modal>}
+            
         </div>
     )
 }

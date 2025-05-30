@@ -7,3 +7,17 @@
     box-sizing: border-box;
     font-size: 1.2em;
 }
+
+.despesa-form .bordered {
+    
+    /* box-shadow: 4px solid rgba(105, 13, 128, 0.6); */
+    padding: 10px 15px;
+    border-radius: 1em;
+    box-shadow: ouset;
+    box-shadow: inset -4px 4px 5em rgba(105, 13, 128, 0.6);;
+    
+}
+
+.despesa-form button {
+    margin: 1em;
+}
