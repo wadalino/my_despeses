@@ -35,7 +35,7 @@ export default function ProjectesDetall({ id: propId }) {
 
   return (
     <div className='despesa-detall'>
-      <h2 className='despesa-detall__title'>Detall del projecte</h2>
+      
 
       <p className='despesa-detall__item'>
         <strong>Nom del projecte:</strong> {projecte.name}

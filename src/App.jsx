@@ -15,8 +15,8 @@ function App() {
     <div>
       <Navbar />
         <Routes>
-          <Route path='/' element={<Projectes />} />
-          <Route path='/login' element={<Login />} />
+          <Route path='/' element={<Login />} />
+          <Route path='/login' element={<Login />}/>
           <Route path='/register' element={<Register />} />
           {/* FIXME Inici should be projectes */}
           <Route path='/projectes' element={<Projectes />} />
@@ -29,9 +29,11 @@ function App() {
           <Route path='/projecte/:id/despeses' element={<ProjectesDetall />} />
           <Route path='/projecte/:id/despeses/afegir' element={<DespesaForm />} />
           <Route path='/projecte/:id/despeses/editar/:idDespesa' element={<DespesaForm />} />
-*/}
+
           <Route path='/despesa/:id' element={<DespesesDetall />} />
-          <Route path='*' element={<Navigate to="/" replace />} />
+*/}
+          
+          <Route path='*' element={<Navigate to="/login" replace />} />
         </Routes>
     </div>
   )

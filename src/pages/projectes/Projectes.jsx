@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp,
-} from 'firebase/firestore';
-import { auth, db } from '../../firebase/firebase.js';
+import { useNavigate} from 'react-router-dom';
+import { collection, addDoc, updateDoc, doc, 
+         serverTimestamp, } from 'firebase/firestore';
+import { auth, db, 
+         deleteProjecte, saveProjecte, getProjectes } from '../../firebase/firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
-import Despeses from '../despeses/Despeses.jsx';
-import DespesesLlista from '../../components/despesesLlista/DespesesLlista.jsx';
 import { useCollection } from '../../hooks/useCollection.jsx';
 import ProjectesLlista from '../../components/projectes/ProjectesLlista.jsx';
 import ProjecteForm from '../../components/projectes/ProjecteForm.jsx';
+import Modal from '../../components/modal/Modal';
 
-export default function Projectes() {
+import './Projectes.css';
+
+export default function Projectes() { 
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [projecte, setProjecte] = useState(null);
   const [nomProjecte, setNomProjecte] = useState("");
   const [descripcio, setDescripcio] = useState("");
   const [editMode, setEditMode] = useState(false);
   const {documents: projectes} = useCollection('projectes');
+  const [mostraModal, setMostraModal] = useState(false);
+  const handleTancar = () => { setMostraModal(false); };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -56,51 +57,34 @@ export default function Projectes() {
     await addDoc(collection(db, "projectes"), newProjecte);
   };
 
-  const updateProjecte = async () => {
-    if (!projecte) return;
-    const ref = doc(db, "projectes", projecte.id);
-    await updateDoc(ref, {
-      name: nomProjecte,
-      description: descripcio,
-      modified: serverTimestamp(),
-    });
-    setEditMode(false);
-  };
 
-  if (!user) return <div>Carregant...</div>;
+  if (!user) return navigate("/");
 
   return (
-    <div>
+    <div className="div-projectes">
       <h2>Els meus projectes</h2>
-      {Array.isArray(projectes) && projectes.length > 0 && (
-        <ProjectesLlista projectes={projectes.filter(p => p.owner === user.uid)} />
+      {Array.isArray(projectes) && 0 <= projectes.length && (
+        <h3>Encara no tens projectes!!</h3>
       )}
-      { /*
-      {projecte ? (
-        <div>
-          <ProjecteForm idProjecte={projecte.id} />
-        </div>
-      ) : (
-        <div>
-          <label>
-            Nom del projecte:
-            <input
-              type="text"
-              value={nomProjecte}
-              onChange={(e) => setNomProjecte(e.target.value)}
-            />
-          </label>
-          <label>
-            Descripció:
-            <textarea
-              value={descripcio}
-              onChange={(e) => setDescripcio(e.target.value)}
-            />
-          </label>
-          <button onClick={crearProjecte}>Crear projecte</button>
-        </div>
-      )} 
-      */ }
+      <button onClick={crearProjecte}>Crea un nou projecte</button>
+      <button onClick={() => setMostraModal(true)}>Afegir Projecte Nou</button>
+      {Array.isArray(projectes) && projectes.length > 0 && (
+        <ProjectesLlista 
+            eliminarProjecte={deleteProjecte} 
+            projectes={
+              projectes.filter(p => p.owner === user.uid)} />
+      )}
+
+      {mostraModal && <Modal handleTancar={handleTancar} esVorera={""} title="afegint un nou Projecte">
+                      <ProjecteForm 
+                        user={user}   
+                        afegirProjecte={saveProjecte}
+                        eliminarProjecte={deleteProjecte}
+                        projecte={projecte} 
+                        />
+
+                  </Modal>}
+
     </div>
   );
 }

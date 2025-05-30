@@ -13,8 +13,8 @@ export default function Modal({children, handleTancar, esVorera, modalNameClass,
         }>
          {/* Capçalera amb títol i botó de tancar */}
         <div className="modal-header">
-          {title && <h2 className="modal-title">{title}</h2>}
-          <button className="modal-close" onClick={handleTancar}>×</button>
+          {/*title && <h2 className="modal-title">{title}</h2>*/}
+          <button className="modal-close" onClick={handleTancar}>×</button> {title}
         </div>
  
             {children}

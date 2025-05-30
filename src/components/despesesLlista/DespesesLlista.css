@@ -88,13 +88,13 @@
 }
 
 .despesa-label {
-  background-color: #ececec;
+  background-color: #383434;
   border-radius: 20px;
   padding: 0.4rem 0.8rem;
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 0.9rem;
-  color: #333;
+  color: #bbbbbb;
 }
 
 .despesa-label:hover {
@@ -103,11 +103,29 @@
 
 .despesa-label .quantia {
   font-size: 0.8em;
-  color: #e6b800;
+  color: #ad8b00;
   margin-left: 0.4rem;
 }
 
 /* focus visual temporal */
 .despesa-focus {
-  background-color: #ffe58a !important;
+  /*background-color: rgba(173, 139, 0, 0.3) !important;*/
+  animation: flash 0.4s ease-in-out;
+}
+
+
+@keyframes flash {
+  0% { background-color: rgba(255, 255, 0, 0.5); }
+  50% { background-color: transparent; }
+  100% { background-color: rgba(255, 255, 0, 0.5); }
+}
+
+.despesa-line {
+  padding:8px;
+  
+}
+.despesa-line span {
+   color: #000;
+   padding: 0.5em;
+   margin: 0.2em;
 }

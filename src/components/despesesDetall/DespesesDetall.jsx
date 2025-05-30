@@ -34,7 +34,7 @@ export default function DespesesDetall({ id: propId }) {
 
   return (
     <div className='despesa-detall'>
-      <h2 className='despesa-detall__title'>Detall de la despesa</h2>
+      
 
       <p className='despesa-detall__item'>
         <strong>Concepte:</strong> {despesa.concepte}

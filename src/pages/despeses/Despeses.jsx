@@ -17,7 +17,7 @@ export default function Despeses(props) {
     const { projecte, usuariAutenticat } = props;
     //console.log("Despeses (usuari):", getAuth().currentUser?.uid);
     //console.log("Despeses (usuari):", usuariAutenticat); 
-    // const [user, setUser] = useState(usuariAutenticat);
+    //const [user, setUser] = useState(usuariAutenticat);
     const [mostraModal, setMostraModal] = useState(false);
     // const [despeses, setDespeses] = useState(null);
 
@@ -69,7 +69,7 @@ export default function Despeses(props) {
                 <button onClick={() => setMostraModal(true)}>Afegir Despesa</button>
             </div>
             {despeses && <DespesesLlista despeses={despeses} eliminarDespesa={eliminarDespesa} projecte={projecte}/>}
-            {mostraModal && <Modal handleTancar={handleTancar} esVorera={"tancar"}>
+            {mostraModal && <Modal handleTancar={handleTancar} esVorera={""} title="afegint una nova despesa">
                 <DespesaForm afegirDespesa={afegirDespesa} usuariAutenticat={usuariAutenticat} projecte={projecte} />
             </Modal>}
             

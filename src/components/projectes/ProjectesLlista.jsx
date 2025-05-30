@@ -37,7 +37,9 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
   useEffect(() => {
     if (projectes && despeses) {
       const actualitzats = projectes.map(projecte => {
-        const despesesDelProjecte = despeses.filter(d => d.projecteId === projecte.id);
+        const despesesDelProjecte = despeses
+          .filter(d => d.projecteId === projecte.id)
+          .sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
         return {
           ...projecte,
           despeses: despesesDelProjecte
@@ -52,22 +54,25 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
     <div>
       {projectesAmbDespeses.map((projecte, index) => (
         <div className={estils.targeta} key={projecte.id} style={{ backgroundColor: getRandomRGBA(0.1) }}>
-          <Link to={`/projecte/${projecte.id}`}>
-            <h2 style={{ color: '#a5a5a5' }}>{projecte.concepte}</h2>
-          </Link>
+          
+          <h2 style={{ color: '#a5a5a5' }}>{projecte.name}</h2>
+          
           <p>{projecte.description}</p>
 
-          <button onClick={() => setProjecteActiuDetalls(projecte.id)}
-                  style={{ backgroundColor: 'rgba(146, 112, 209, 0.4)', color: '#c5c5c5' }}>
-            Detalls
-          </button>
+          <div>
           <button onClick={() => setProjecteActiuParticipants(projecte)}
                   style={{ backgroundColor: 'rgba(187, 62, 177, 0.49)', color: '#c5c5c5' }}>
-            Participants
+            Participants <small>({projecte.participants.length})</small>
           </button>
           <button onClick={() => setProjecteActiuDespeses(projecte)}
                   style={{ backgroundColor: 'rgba(70, 130, 180, 0.4)', color: '#c5c5c5' }}>
-            Despeses
+            Despeses <small>({projecte.despeses.length})</small>
+          </button>
+          </div>
+          <div>
+          <button onClick={() => setProjecteActiuDetalls(projecte.id)}
+                  style={{ backgroundColor: 'rgba(146, 112, 209, 0.4)', color: '#c5c5c5' }}>
+            Detalls
           </button>
           <button onClick={() => setProjecteActiuEdit(projecte)}
                   style={{ backgroundColor: 'rgba(200, 255, 0, 0.3)', color: '#c5c5c5' }}>
@@ -77,29 +82,30 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
                   style={{ backgroundColor: 'rgba(255, 69, 0, 0.4)', color: '#c5c5c5' }}>
             Eliminar
           </button>
+          </div>
 
           <hr />
-          <p className='despesa-detall__item'>
-            <strong>Participants:</strong> {projecte.participants?.length || 0} participants
-          </p>
-          <p className='despesa-detall__item'>
+          
+          <p className='projecte-detall__item'>
             <strong>Projecte ID:</strong> {projecte.id}
           </p>
-          <p className='despesa-detall__item'>
-            <strong>Despeses:</strong> {projecte.despeses?.length || 0} despeses
+          <p className='projecte-detall__item'>
+            <strong>Total de despeses:</strong> { 
+                projecte.despeses?.reduce((total, despesa) => total + despesa.quantia, 0).toFixed(2) || 0 
+              } €
           </p>
           <hr />
         </div>
       ))}
-
+      
       {projecteActiuDetalls && (
-        <Modal handleTancar={() => setProjecteActiuDetalls(null)} esVorera={""}>
+        <Modal handleTancar={() => setProjecteActiuDetalls(null)} esVorera={""} title={`detalls del projecte '${projectesAmbDespeses[0].name}'`}>
           <ProjectesDetall id={projecteActiuDetalls} />
         </Modal>
       )}
-
+      
       {projecteActiuParticipants && (
-        <Modal handleTancar={() => setProjecteActiuParticipants(null)} esVorera={""}>
+        <Modal handleTancar={() => setProjecteActiuParticipants(null)} esVorera={""} title={`participants del projecte '${projecteActiuParticipants.name}'`}>
           <ProjectesParticipants
             participants={projecteActiuParticipants.participants}
             onUpdateParticipants={async (newList) => {
@@ -119,16 +125,16 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
       )}
 
       {projecteActiuEdit && (
-        <Modal handleTancar={() => setProjecteActiuEdit(null)} esVorera={""}>
+        <Modal handleTancar={() => setProjecteActiuEdit(null)} esVorera={""} title={`editant projecte '${projecteActiuEdit.name}'`}>
           <ProjecteForm projecte={projecteActiuEdit} />
         </Modal>
       )}
         
       {projecteActiuDespeses && (
         
-        <Modal modalNameClass="modalDespeses" handleTancar={() => setProjecteActiuDespeses(null)} esVorera={""}>
+        <Modal modalNameClass="modalDespeses" handleTancar={() => setProjecteActiuDespeses(null)} esVorera={""} title={`despeses del projecte '${projecteActiuDespeses.name}'`}>
           <div>
-            <h2>Despeses del projecte: {projecteActiuDespeses.name}</h2>
+            
             <Despeses
                 projecte={projecteActiuDespeses}
                 despeses={projecteActiuDespeses.despeses}

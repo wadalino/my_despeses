@@ -2,9 +2,10 @@
   max-height: 80vh;
   min-width: 600px;
   overflow-y: auto;
-  background: #646464;
-  border-radius: 30px;
-  padding: 30px;
+  background: #504f4f;
+  border-radius: 15px;
+  padding: 0px;
+  padding-bottom: 1em;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 .modalDespeses-fons {
@@ -19,4 +20,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.projecte-detall__item {
+  color: #bbb;
 }

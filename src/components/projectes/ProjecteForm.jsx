@@ -5,6 +5,7 @@ import useCollection from '../../hooks/useCollection'; // ajusta la ruta
 export default function ProjecteForm({ 
   user, 
   afegirProjecte, 
+  eliminarProjecte,
   actualitzarProjecte,
   projecte 
 }) {
@@ -96,7 +97,7 @@ export default function ProjecteForm({
       </label>
 
       <button disabled={loading}>
-        {projecte ? 'Actualitzar' : 'Afegir'}
+        {projecte?.id ? 'Actualitzar' : 'Afegir'}
       </button>
     </form>
   );

@@ -28,7 +28,7 @@ export default function Login() {
       resetForm();
       //userLoggedIn = true; // Assuming you have a state to track user login status
       // no utilitzam Navigate perque no esteim dins d'un component de React Router
-      return navigate("/");
+      return navigate("/projectes");
 
     } else {
       console.error("Error logging in user:", res.code, res.message);

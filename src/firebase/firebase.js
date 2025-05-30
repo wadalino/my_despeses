@@ -15,12 +15,7 @@ export const db = getFirestore(app);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
 
-export const saveDespesa = async (despesa) => {
-  console.log(despesa);
-  const docRef = await addDoc(collection(db, "despeses"), despesa);
 
-  return docRef.id;   
-}
   
 export const saveCollection = async (collectionName, document) => {
   console.log(document);
@@ -30,6 +25,12 @@ export const saveCollection = async (collectionName, document) => {
 }
 
 /* DESPESA FUNCTIONS */
+export const saveDespesa = async (despesa) => {
+  console.log(despesa);
+  const docRef = await addDoc(collection(db, "despeses"), despesa);
+
+  return docRef.id;   
+}
 export const getDespeses = () => 
   getDocs(collection(db, "despeses"));
 
@@ -50,6 +51,12 @@ export const getProjectes = () =>
 export const onGetProjecte = (id, callback) =>
   onSnapshot(doc(db, "projectes", id), callback);
 
+export const saveProjecte = async (despesa) => {
+  console.log(despesa);
+  const docRef = await addDoc(collection(db, "projectes"), despesa);
+
+  return docRef.id;   
+}
 export const deleteProjecte = async (id) => {
   deleteDoc(doc(db, "projectes", id));
 }

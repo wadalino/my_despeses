@@ -11,3 +11,15 @@
 .targeta button {
     margin: 2px;
 }
+
+.targeta h2 {
+    border-bottom: 5px solid #666;
+    padding-bottom: 5px;
+    margin-bottom: 0px;
+}
+
+.targeta p {
+    color: #999;
+    padding-bottom: 5px;
+    margin-top: 0px;
+}
