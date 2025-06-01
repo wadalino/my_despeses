@@ -2,7 +2,7 @@ import { firebaseConfig } from "./config"
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
-import { getFirestore, addDoc, collection, getDocs, onSnapshot, doc, deleteDoc, updateDoc } from "firebase/firestore"
+import { getFirestore, addDoc, collection, getDoc, getDocs, onSnapshot, doc, deleteDoc, updateDoc } from "firebase/firestore"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth'; 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -40,6 +40,20 @@ export const onGetCollection = (collectionName, callback) =>
 export const onGetDespesa = (id, callback) =>
   onSnapshot(doc(db, "despeses", id), callback);
 
+export const updateDespesa = async (despesa, novaDespesa) => {
+  const despesaId = despesa.id ?? null;
+  if (!despesaId) return false;
+
+  try {
+    const docRef = doc(db, 'despesas', despesaId);
+    await updateDoc(docRef, novaDespesa);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error actualitzant la despesa:", error);
+    return false;
+  }
+};
+
 export const deleteDespesa = async (id) => {
   deleteDoc(doc(db, "despeses", id));
 }
@@ -51,15 +65,44 @@ export const getProjectes = () =>
 export const onGetProjecte = (id, callback) =>
   onSnapshot(doc(db, "projectes", id), callback);
 
-export const saveProjecte = async (despesa) => {
-  console.log(despesa);
-  const docRef = await addDoc(collection(db, "projectes"), despesa);
-
+export const saveProjecte = async (projecte) => {
+  //console.log(projecte);
+  const docRef = await addDoc(collection(db, "projectes"), projecte);
   return docRef.id;   
 }
+
+export const updateProjecte = async (projecte) => {
+  const projecteId = projecte.id ?? null;
+  if (!projecteId) return false;
+
+  try {
+    const docRef = doc(db, 'projectes', projecteId);
+    await updateDoc(docRef, projecte);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error actualitzant el projecte:", error);
+    return false;
+  }
+};
+
 export const deleteProjecte = async (id) => {
   deleteDoc(doc(db, "projectes", id));
 }
+
+export const getProjectePerUID = async (uid) => {
+  try {
+    const q = query(collection(db, "projectes"), where("owner", "==", uid));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error obtenint projecte del uid:", error);
+    throw error;
+  }
+}
+
 
 export const getDespesesPerProjecte = async (projecteId) => {
   try {
@@ -163,7 +206,13 @@ export const getCurrentUser = () => {
 }
 export const getUserId = () => {
   const user = getCurrentUser();
+  // console.log("From Firebase getUserId: ", user);
   return user ? user.uid : null;
 }
 
+export const getUserEmail = () => {
+  const user = getCurrentUser();
+  console.log("From Firebase getUserId: ", user);
+  return user ? user.email : null;
+}
 

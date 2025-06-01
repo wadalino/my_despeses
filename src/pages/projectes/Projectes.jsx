@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate} from 'react-router-dom';
-import { collection, addDoc, updateDoc, doc, 
-         serverTimestamp, } from 'firebase/firestore';
-import { auth, db, 
-         deleteProjecte, saveProjecte, getProjectes } from '../../firebase/firebase.js';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auth, deleteProjecte, saveProjecte } from '../../firebase/firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCollection } from '../../hooks/useCollection.jsx';
 import ProjectesLlista from '../../components/projectes/ProjectesLlista.jsx';
@@ -15,13 +12,8 @@ import './Projectes.css';
 export default function Projectes() { 
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [projecte, setProjecte] = useState(null);
-  const [nomProjecte, setNomProjecte] = useState("");
-  const [descripcio, setDescripcio] = useState("");
-  const [editMode, setEditMode] = useState(false);
-  const {documents: projectes} = useCollection('projectes');
   const [mostraModal, setMostraModal] = useState(false);
-  const handleTancar = () => { setMostraModal(false); };
+  const { documents: projectes } = useCollection('projectes');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -34,57 +26,37 @@ export default function Projectes() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (user && Array.isArray(projectes)) {
-      const propis = projectes.filter(p => p.owner === user.uid);
-      if (propis.length > 0) {
-        setProjecte(propis[0]);
-        setNomProjecte(propis[0].name);
-        setDescripcio(propis[0].description || "");
-      }
-    }
-  }, [user, projectes]);
-
-  const crearProjecte = async () => {
-    const newProjecte = {
-      name: nomProjecte,
-      description: descripcio,
-      created: serverTimestamp(),
-      modified: serverTimestamp(),
-      owner: user.uid,
-      participants: [user.uid],
-    };
-    await addDoc(collection(db, "projectes"), newProjecte);
-  };
-
-
   if (!user) return navigate("/");
+
+  // Filtrar projectes del usuario
+  const projectesDelUsuari = Array.isArray(projectes)
+    ? projectes.filter(p => p.owner === user.uid)
+    : [];
 
   return (
     <div className="div-projectes">
       <h2>Els meus projectes</h2>
-      {Array.isArray(projectes) && 0 <= projectes.length && (
+
+      {projectesDelUsuari.length === 0 ? (
         <h3>Encara no tens projectes!!</h3>
-      )}
-      <button onClick={crearProjecte}>Crea un nou projecte</button>
-      <button onClick={() => setMostraModal(true)}>Afegir Projecte Nou</button>
-      {Array.isArray(projectes) && projectes.length > 0 && (
+      ) : (
         <ProjectesLlista 
-            eliminarProjecte={deleteProjecte} 
-            projectes={
-              projectes.filter(p => p.owner === user.uid)} />
+          eliminarProjecte={deleteProjecte} 
+          projectes={projectesDelUsuari} 
+        />
       )}
 
-      {mostraModal && <Modal handleTancar={handleTancar} esVorera={""} title="afegint un nou Projecte">
-                      <ProjecteForm 
-                        user={user}   
-                        afegirProjecte={saveProjecte}
-                        eliminarProjecte={deleteProjecte}
-                        projecte={projecte} 
-                        />
+      <button onClick={() => setMostraModal(true)}>Afegir Projecte Nou</button>
 
-                  </Modal>}
-
+      {mostraModal && (
+        <Modal handleTancar={() => setMostraModal(false)} esVorera={""} title="Afegint un nou Projecte">
+          <ProjecteForm 
+            user={user}   
+            afegirProjecte={saveProjecte}
+            eliminarProjecte={deleteProjecte}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import './DespesaForm.css';
-import useCollection from '../../hooks/useCollection'; // ajusta la ruta
+import useCollection from '../../hooks/useCollection';
 import ParticipantSelector from '../participants/ParticipantSelector';
-
-
+import { getUserId } from '../../firebase/firebase.js';
 
 export default function DespesaForm({ 
   usuariAutenticat, 
@@ -12,66 +11,73 @@ export default function DespesaForm({
   despesa,
   projecte
 }) {
-  const projecteId = projecte?.id || null; // si no té projecte, es deixa a null
+  console.log("UsuariAutenticat: ", usuariAutenticat);
+  const projecteId = projecte?.id || null;
+  const { documents: allParticipants, loading } = useCollection('participants');
+  const allParticipantsProject = projecte?.participants;
+
+  // 🔹 Estados iniciales
   const [concepte, setConcepte] = useState('');
   const [quantia, setQuantia] = useState('');
-  const [pagatPer, setPagatPer] = useState('');
-  const [participants, setParticipants] = useState([]);
+  const [pagatPer, setPagatPer] = useState(usuariAutenticat?.owner || '');
+  const [participants, setParticipants] = useState([usuariAutenticat?.owner] || []);
 
-  const { documents: allParticipants, loading } = useCollection('participants');
-  const allParticipantsProject = projecte?.participants; 
-  //console.log("DespesaForm AllParticipants:", allParticipants);
-  //console.log("DespesaForm despesa props : ", afegirDespesa, user, actualitzarDespesa, despesa);  
-  //console.log("DespesaForm despesa afegirDespesa: ", afegirDespesa);  
-  //console.log("DespesaForm projecte: ", projecte);  
-  //console.log("DespesaForm allParticipants: ", allParticipants);   
-  
+  // 🔥 Solo actualizar campos si estamos editando
+  useEffect(() => {
+    console.log("handleSubmit executat", { concepte, quantia, pagatPer, participants });
 
-  // com empram es mateix form per afegir i actualitzar,
-  // si hi ha una despesa, carregam ses dades 
-  useEffect(() => { 
     if (despesa) {
-      setConcepte(despesa.concepte || 'no especificat');
-      setQuantia(despesa.quantia.toString() || 0);
-      setPagatPer(despesa.pagatPer || usuariAutenticat?.uid);
-      setParticipants(despesa.participants || [usuariAutenticat?.uid]);
+      setConcepte(despesa.concepte ?? '');
+      setQuantia(despesa.quantia?.toString() ?? '');
+      setPagatPer(despesa.pagatPer ?? usuariAutenticat?.owner ?? '');
+      setParticipants(despesa.participants ?? []);
     } else {
-      resetForm();
+      // 🔹 Solo para añadir, aseguramos que se inicialice correctamente
+      setPagatPer(usuariAutenticat?.owner || '');
+      setParticipants([usuariAutenticat?.owner] || []);
     }
   }, [despesa, usuariAutenticat]);
 
-
-  const resetForm = () => {
-    setConcepte('');
-    setQuantia('');
-    setPagatPer('');
-    setParticipants([]);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const despesa = {
+
+    if (!concepte.trim() || !quantia || !pagatPer || participants.length === 0) {
+      alert('Tots els camps són obligatoris.');
+      return;
+    }
+
+    const uid = getUserId();
+    const participantsFinal = uid && !participants.includes(uid)
+      ? [...participants, uid]
+      : participants;
+
+    const novaDespesa = {
       projecteId,
       concepte,
-      quantia: parseFloat(quantia),
-      pagatPer: pagatPer || usuariAutenticat?.uid,
-      participants,
+      quantia: Number(quantia) || 0,
+      pagatPer,
+      participants: participantsFinal,
       createdAt: new Date(),
     };
-    //console.log("DespesaForm despesa: ", despesa);
-    //console.log("DespesaForm projectId: ", projecteId);
-    //console.log("DespesaForm e: ", e);
-    afegirDespesa(despesa);
-    resetForm();
+
+    if (despesa) {
+      actualitzarDespesa({ despesa, novaDespesa });
+    } else {
+      afegirDespesa(novaDespesa);
+      // 🔥 Al añadir, reseteamos con el user actual como pagador
+      setConcepte('');
+      setQuantia('');
+      setPagatPer(usuariAutenticat?.owner || '');
+      setParticipants([usuariAutenticat?.owner] || []);
+    }
   };
 
-  const handleParticipantsChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
-    setParticipants(selected);
+  const handleParticipantsChange = (nousParticipants) => {
+    setParticipants(nousParticipants);
   };
 
-  // console.log("DespesaForm AllParticipants:", allParticipants);
+  if (loading) return <p>Carregant participants...</p>;
+
   return (
     <form className='despesa-form' onSubmit={handleSubmit}>
       <label>
@@ -80,8 +86,10 @@ export default function DespesaForm({
           type='text'
           onChange={(e) => setConcepte(e.target.value)}
           value={concepte}
+          required
         />
       </label>
+
       <label>
         <span>Quantia (€)</span>
         <input
@@ -89,37 +97,24 @@ export default function DespesaForm({
           step='0.01'
           onChange={(e) => setQuantia(e.target.value)}
           value={quantia}
+          required
         />
-      </label> 
+      </label>
 
       <label>
         <span>Pagat per</span>
-        {/* 
-        /// INFO not enabled because can't be paid by others that not in participants collection
-        <select onChange={(e) => setPagatPer(e.target.value)} value={pagatPer}>
-          <option value="">-- Selecciona --</option>
-          {allParticipantsProject?.map((pIdOrName, idx) => {
-            // Comprova si aquest participant està a la llista oficial (té username)
-            const match = allParticipants?.find(p => p.uid === pIdOrName);
-
-            // Mostra username si hi ha coincidència, o el nom literal
-            return (
-              <option key={idx} value={pIdOrName}>
-                {match ? match.username : pIdOrName}
-              </option>
-            );
-          })}
-        </select> */}
-        
-        <select onChange={(e) => setPagatPer(e.target.value)} value={pagatPer}>
-          <option value="">-- Selecciona --</option>
+        <select 
+          onChange={(e) => setPagatPer(e.target.value)} 
+          value={pagatPer || usuariAutenticat?.owner || ''}
+          required
+        >
           {allParticipantsProject
-            ?.filter(pId => allParticipants?.some(p => p.uid === pId)) // només els que són uids vàlids
+            ?.filter(pId => allParticipants?.some(p => p.uid === pId))
             .map((uid, idx) => {
               const match = allParticipants.find(p => p.uid === uid);
               return (
                 <option key={idx} value={uid}>
-                  {match?.username}
+                  {match?.username || uid}
                 </option>
               );
             })}
@@ -127,16 +122,17 @@ export default function DespesaForm({
       </label>
 
       <label className='bordered'>
-        <span>Participants</span>
+        <h4>Participants</h4>
+        {console.log('Participants inline', participants)}
         <ParticipantSelector
           participantsRef={allParticipants}
-          projectParticipants={allParticipantsProject}          // array amb { uid, username }
-          selected={participants}                           // array amb valors seleccionats
-          onChange={(nousParticipants) => setParticipants(nousParticipants)} // callback per actualitzar participants
+          projectParticipants={allParticipantsProject}
+          selected={participants}
+          onChange={handleParticipantsChange}
         />
       </label>
 
-      <button >
+      <button type="submit">
         {despesa ? 'Actualitzar' : 'Afegir'}
       </button>
     </form>

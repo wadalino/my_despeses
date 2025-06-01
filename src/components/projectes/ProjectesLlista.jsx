@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { updateProjecteParticipants } from '../../firebase/firebase';
+import { updateProjecteParticipants, updateProjecte } from '../../firebase/firebase';
 import { useCollection } from '../../hooks/useCollection';
 
 import Modal from '../modal/Modal';
@@ -126,7 +126,7 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
 
       {projecteActiuEdit && (
         <Modal handleTancar={() => setProjecteActiuEdit(null)} esVorera={""} title={`editant projecte '${projecteActiuEdit.name}'`}>
-          <ProjecteForm projecte={projecteActiuEdit} />
+          <ProjecteForm projecte={projecteActiuEdit} actualitzarProjecte={updateProjecte} />
         </Modal>
       )}
         

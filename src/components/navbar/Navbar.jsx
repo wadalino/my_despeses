@@ -1,7 +1,7 @@
 
-import { loginState, logoutUser, auth } from '../../firebase/firebase';
+import { loginState, logoutUser, auth, getUserEmail} from '../../firebase/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import './Navbar.css';
 
@@ -48,9 +48,11 @@ export default function Navbar() {
       });
       return () => unsubscribe();
     }, []);
-  // console.log(user);
-  const uname = "";
-  // uname = useUsernameByUid(user.uid);
+
+
+
+  
+  
   return (
     <nav className="navbar">
       <ul>
@@ -64,7 +66,8 @@ export default function Navbar() {
         ) : (
           <>
             <li><Link to="/projectes" className='btn'>⭐ Projectes</Link></li>
-            <li><button onClick={logout} className='btn'>{uname} 🔓 Logout</button></li>
+            <li><button onClick={logout} className='btn' style={{textAlign:'right'}}>🔓 Logout<br/>
+                <small>{getUserEmail()}</small></button></li>
           </>
         )}
       </ul>

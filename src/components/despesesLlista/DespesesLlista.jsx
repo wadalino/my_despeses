@@ -8,6 +8,7 @@ import DespesaForm from '../despesaForm/DespesaForm'
 
 import estils from './DespesesLlista.module.css'
 import { getAuth } from 'firebase/auth';
+import { updateDespesa } from '../../firebase/firebase.js' 
 
 function getRandomRGBA(alpha = 0.15) {
     const r = Math.floor(Math.random() * 256);   // 0-255
@@ -126,7 +127,8 @@ export default function DespesesLlista({ despeses, eliminarDespesa, projecte }) 
                 <Modal handleTancar={() => setDespesaActivaEdit(null)} esVorera={""} title={`editant la despesa '${despesaActivaEdit.concepte}'`}>
                     <DespesaForm despesa={despesaActivaEdit}
                         usuariAutenticat={getAuth().currentUser?.uid}
-                        projecte={projecte} />
+                        projecte={projecte}
+                        actualitzarDespesa={updateDespesa} />
 
                     {/*<DespesaForm 
                         afegirDespesa={afegirDespesa}  

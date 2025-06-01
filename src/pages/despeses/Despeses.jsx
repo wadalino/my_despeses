@@ -70,7 +70,10 @@ export default function Despeses(props) {
             </div>
             {despeses && <DespesesLlista despeses={despeses} eliminarDespesa={eliminarDespesa} projecte={projecte}/>}
             {mostraModal && <Modal handleTancar={handleTancar} esVorera={""} title="afegint una nova despesa">
-                <DespesaForm afegirDespesa={afegirDespesa} usuariAutenticat={usuariAutenticat} projecte={projecte} />
+                <DespesaForm 
+                    afegirDespesa={afegirDespesa} 
+                    usuariAutenticat={usuariAutenticat} 
+                    projecte={projecte} />
             </Modal>}
             
         </div>

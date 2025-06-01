@@ -1,46 +1,45 @@
 import { useState, useEffect } from 'react';
 import '../despesaForm/DespesaForm.css';
-import useCollection from '../../hooks/useCollection'; // ajusta la ruta
+import useCollection from '../../hooks/useCollection'; // ajusta la ruta si cal
+import ParticipantSelector from '../participants/ParticipantSelector';
 
 export default function ProjecteForm({ 
   user, 
   afegirProjecte, 
-  eliminarProjecte,
-  actualitzarProjecte,
+  actualitzarProjecte, // actualitzarProjecte no s'utilitza
   projecte 
 }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [owner, setOwner] = useState('');
   const [participants, setParticipants] = useState([]);
+  const allParticipantsProject = projecte?.participants;
 
   const { documents: allParticipants, loading } = useCollection('participants');
 
-  // com empram es mateix form per afegir i actualitzar,
-  // si hi ha una despesa, carregam ses dades
+  // Si hi ha projecte, carrega les dades per editar
   useEffect(() => {
     if (projecte) {
-      setName(projecte.name || 'no especificat');
-      setDescription(projecte.description || 'no especificat');
-      setOwner(projecte.owner || user?.uid);
-      setParticipants(projecte.participants || [user?.uid]);
+      setName(projecte.name || '');
+      setDescription(projecte.description || '');
+      setOwner(projecte.owner || user?.uid || '');
+      setParticipants(projecte.participants || [user?.uid] || []);
     } else {
       resetForm();
     }
   }, [projecte, user]);
 
-
   const resetForm = () => {
     setName('');
     setDescription('');
-    setOwner('');
-    setParticipants([]);
+    setOwner(user?.uid || ''); // per defecte posem el user?.uid
+    setParticipants(user?.uid ? [user.uid] : []);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const projecte = {
+    const newProjecte = {
       name,
       description,
       owner,
@@ -48,16 +47,20 @@ export default function ProjecteForm({
       modified: new Date(),
     };
 
-    afegirProjecte(projecte);
+    if (projecte?.id) {
+      // Si el projecte existeix, actualitza
+      actualitzarProjecte(projecte.id, newProjecte);
+    } else {
+      // Si no, crea un de nou
+      afegirProjecte(newProjecte);
+    }
     resetForm();
   };
 
-  const handleParticipantsChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
-    setParticipants(selected);
+  const handleParticipantsChange = (selected) => {
+    setParticipants();
   };
 
-  console.log("ProjecteForm projecte: ", projecte);
   return (
     <form className='despesa-form' onSubmit={handleSubmit}>
       <label>
@@ -66,8 +69,10 @@ export default function ProjecteForm({
           type='text'
           onChange={(e) => setName(e.target.value)}
           value={name}
+          required
         />
       </label>
+
       <label>
         <span>Descripció</span>
         <input
@@ -79,14 +84,15 @@ export default function ProjecteForm({
 
       <label>
         <span>Owner</span>
-        <select onChange={(e) => setOwner(e.target.value)} value={owner}>
+        <select onChange={(e) => setOwner(e.target.value)} value={owner} required>
           <option value="">-- Selecciona --</option>
           {allParticipants?.map(p => (
             <option key={p.uid} value={p.uid}>{p.username}</option>
           ))}
         </select>
       </label>
-
+      
+      {/*
       <label>
         <span>Participants</span>
         <select multiple value={participants} onChange={handleParticipantsChange}>
@@ -95,8 +101,15 @@ export default function ProjecteForm({
           ))}
         </select>
       </label>
+      */}
 
-      <button disabled={loading}>
+      <ParticipantSelector
+                participantsRef={allParticipants}
+                projectParticipants={allParticipantsProject}
+                selected={participants}
+                onChange={handleParticipantsChange}
+              />
+      <button type='submit' disabled={loading}>
         {projecte?.id ? 'Actualitzar' : 'Afegir'}
       </button>
     </form>

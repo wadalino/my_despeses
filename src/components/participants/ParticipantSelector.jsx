@@ -3,28 +3,24 @@ import './ParticipantSelector.css';
 import { useCollection } from '../../hooks/useCollection';
 
 export default function ParticipantSelector({
-  participantsRef_old = [],          // [{ uid, username }]
-  projectParticipants = [],      // ["uid", "pepito", ...]
-  selected = [],                 // ["uid", "ana", ...] 
+  participantsRef_old = [],
+  projectParticipants = [],
+  selected = [],
   onChange = () => {}
 }) {
   const [participants, setParticipants] = useState([]);
   const [inputParticipant, setInputParticipant] = useState('');
   const [suggestions, setSuggestions] = useState([]);
-  const { documents: participantsRef } = useCollection('participants');
-  // 👇 Només es fa una vegada a la càrrega
-  useEffect(() => {
-    const combinats = Array.from(new Set([...selected, ...projectParticipants]));
-    
-    // Només actualitzem si són diferents
-    const iguals = combinats.length === participants.length &&
-      combinats.every(p => participants.includes(p));
+  const { documents: participantsRef = participantsRef_old } = useCollection('participants');
 
-    if (!iguals) {
-      setParticipants(combinats);
-      onChange(combinats);
+  useEffect(() => {
+    if (participants.length === 0) {
+      const combinats = Array.from(new Set([...selected, ...projectParticipants]));
+      const combinatsFiltrats = combinats.filter(p => p && p.trim() !== '');
+      setParticipants(combinatsFiltrats);
     }
   }, [selected, projectParticipants]);
+
 
   const obtenirNom = (uidOrName) => {
     const match = participantsRef?.find(p => p.uid === uidOrName);
@@ -52,13 +48,9 @@ export default function ParticipantSelector({
     setInputParticipant(valor);
 
     if (valor.length > 0) {
-      const resultats = projectParticipants
-        .filter(pId => {
-          const match = participantsRef.find(p => p.uid === pId);
-          const nom = match ? match.username : pId;
-          return nom.toLowerCase().includes(valor) && !participants.includes(pId);
-        });
-
+      const resultats = participantsRef
+        .filter(p => p.username.toLowerCase().includes(valor) && !participants.includes(p.uid))
+        .map(p => p.uid);
       setSuggestions(resultats);
     } else {
       setSuggestions([]);
@@ -67,9 +59,9 @@ export default function ParticipantSelector({
 
   return (
     <div className="participants-wrapper">
+      <div>Posibles participants</div>
       {participants.map((p, idx) => {
         const esManual = !participantsRef?.some(ap => ap.uid === p);
-
         return (
           <span key={idx} className={`participant-tag ${esManual ? 'manual' : ''}`}>
             {obtenirNom(p)}
@@ -90,16 +82,17 @@ export default function ParticipantSelector({
           }
         }}
       />
-
+      <div style={{position: 'relative'}}>
       {suggestions.length > 0 && (
         <ul className="suggestions-list">
           {suggestions.map((pid, idx) => (
-            <li key={idx} onMouseDown={() => afegirParticipant(pid)}>
+            <li key={idx} onClick={() => afegirParticipant(pid)}>
               {obtenirNom(pid)}
             </li>
           ))}
         </ul>
       )}
+      </div>
     </div>
   );
 }

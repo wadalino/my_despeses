@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useCollection from '../../hooks/useCollection';
+import ParticipantSelector from '../participants/ParticipantSelector';
 
 import './ProjecteParticipants.css';
 
@@ -79,7 +80,7 @@ export default function ProjecteParticipants({ participants: propParticipants = 
           <button onClick={afegirParticipantUid}>Afegir</button>
         </label>
       </div>
-
+      
       <div className="guardar-container">
         <button onClick={handleGuardar} className="guardar-button">
           Desar participants

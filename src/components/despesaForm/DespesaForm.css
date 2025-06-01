@@ -21,3 +21,16 @@
 .despesa-form button {
     margin: 1em;
 }
+
+.bordered h4 {
+    padding: 5px 15px;
+    border-bottom: 2px solid rgba(0,0,0,0.3);
+    margin-top: -10px;
+    margin-right: -15px;
+    margin-left: -15px;
+    margin-bottom: 20px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    background-color: rgba(0,0,0,0.3);
+
+}
