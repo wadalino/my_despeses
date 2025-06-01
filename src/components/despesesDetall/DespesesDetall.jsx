@@ -27,7 +27,7 @@ export default function DespesesDetall({ id: propId }) {
   const { participantsMap, loading: loadingParticipants } = useParticipantsMap();
 
   const nomsParticipants = despesa?.participants
-    ?.map(uid => participantsMap.get(uid) || uid)
+    ?.map(uid => participantsMap.get(id) || id)
     .join(', ');
 
   if (!despesa) return <p>Despesa no trobada...</p>;

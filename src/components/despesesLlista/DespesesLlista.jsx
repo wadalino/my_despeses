@@ -1,14 +1,12 @@
-import React from 'react'
-import { useRef } from 'react';
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+
+import { useRef, useState } from 'react';
 import Modal from '../modal/Modal'
 import DespesesDetall from '../despesesDetall/DespesesDetall.jsx'
 import DespesaForm from '../despesaForm/DespesaForm'
 
 import estils from './DespesesLlista.module.css'
 import { getAuth } from 'firebase/auth';
-import { updateDespesa } from '../../firebase/firebase.js' 
+import { updateDespesa } from '../../firebase/firebase.js'
 
 function getRandomRGBA(alpha = 0.15) {
     const r = Math.floor(Math.random() * 256);   // 0-255
@@ -16,6 +14,9 @@ function getRandomRGBA(alpha = 0.15) {
     const b = Math.floor(Math.random() * 256);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;   // alpha = transparència
 }
+import IconDespesa from '../../icons/iconDespesa.jsx';
+import IconParticipants from '../../icons/iconParticipants.jsx';
+import Badge from '../utils/Badge.jsx';
 
 export default function DespesesLlista({ despeses, eliminarDespesa, projecte }) {
     // console.log("DespesesLlista projecteId:", projecte?.id);
@@ -25,31 +26,43 @@ export default function DespesesLlista({ despeses, eliminarDespesa, projecte }) 
     const despesesFiltrades = projecte.id
         ? despeses.filter(d => d.projecteId === projecte.id)
         : despeses;
+
+    // agafam ref i feim scroll, també efecte de flash    
     const refs = useRef({});
     const handleObrirDespesa = (id) => {
-  const element = refs.current[id];
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const element = refs.current[id];
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    let count = 0;
-    const maxFlashes = 3;
+            let count = 0;
+            const maxFlashes = 3;
 
-    const flashInterval = setInterval(() => {
-      element.classList.add('despesa-focus');
+            const flashInterval = setInterval(() => {
+                element.classList.add('despesa-focus');
 
-      setTimeout(() => {
-        element.classList.remove('despesa-focus');
-      }, 300); // tiempo del efecto
+                setTimeout(() => {
+                    element.classList.remove('despesa-focus');
+                }, 300); // tiempo del efecto
 
-      count++;
-      if (count >= maxFlashes) {
-        clearInterval(flashInterval);
-      }
-    }, 400); // cada cuánto se repite
-  }
-};
-    // console.log("DespesesLlista despesesFiltrades:", despesesFiltrades);
+                count++;
+                if (count >= maxFlashes) {
+                    clearInterval(flashInterval);
+                }
+            }, 400); // cada cuánto se repite
+        }
+    };
 
+    const actualitzarDespesa = (despesa) => {
+            // FIXME: una despesa ha de tenir un projecte associat
+            console.log("actualitzarDespesa:", despesa);
+            saveDespesa(despesa)
+                .then((idDespesa) => {
+                    despesa.id = idDespesa;
+                    despesa.projecteId = projecteId || null; // si no té projecte, es deixa a null
+                    return [despesa];
+                });
+            setMostraModal(false);
+        };
 
     // ordenam la llista per data de cració
     despesesFiltrades.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
@@ -78,31 +91,89 @@ export default function DespesesLlista({ despeses, eliminarDespesa, projecte }) 
             {despesesFiltrades.map((despesa, index) => (
                 <div
                     className={estils.targeta}
+
                     key={despesa.id}
                     ref={el => refs.current[despesa.id] = el}
-                    style={{ backgroundColor: getRandomRGBA(0.1) }}
+                    style={{
+                        backgroundColor: getRandomRGBA(0.1),
+                        position: 'relative'
+                    }}
                 >
+                    <div style={{
+                        fontSize: '0.7em',
+                        backgroundColor: '#888',
+                        border: '3px solid #555',
+                        borderRadius: '5px',
+                        position: 'absolute',
+                        left: '-20px',
+                        width: '160px', index: '100'
+                    }}>
+                        📅&nbsp;&nbsp;{despesa.createdAt.toDate().toLocaleString('ca-ES')}
+                    </div>
+                    <div style={{
+                        fontSize: '0.7em',
+                        color: '#000',
+                        fontWeight: 'bold',
+                        fontSize: '1em',
+                        padding: '5px',
+                        border: '3px solid #aaaa00',
+                        borderRightWidth: '0px',
+                        borderTopWidth: '0px',
+                        borderTopLeftRadius: '0px',
+                        borderBottomLeftRadius: '10px',
+                        borderTopRightRadius: '0px',
+                        borderBottomRightRadius: '0px',
+                        backgroundColor: '#aaaa0090',
+                        position: 'absolute',
+                        right: '0px',
+                        top: '0px',
+                        width: '120px', index: '110'
+                    }}>
+                        <IconDespesa />&nbsp;
+                        {despesa.quantia.toFixed(2)}
+                        €
+                    </div>
+
+
                     <h2 style={{ color: '#a5a5a5' }}>
                         {despesa.concepte}&nbsp;
-
-
-
                     </h2>
 
-                    <div className="despesa-line">
-                        <span style={{ fontSize: '0.7em', backgroundColor: '#888', border: '3px solid #555', borderRadius: '5px' }}>
-                            {despesa.quantia.toFixed(2)}
-                            €
+                    <div className="despesa-line" style={{ paddingTop: '20px' }}>
+                        <span style={{
+                            fontSize: '1em',
+                            padding: '15px',
+                            backgroundColor: '#888',
+                            border: '3px solid #555',
+                            borderRadius: '5px'
+                        }}>
+                            &nbsp;
+                            <span style={{
+                                fontSize: '1.1em',
+                                color: '#000',
+                                padding: '5px',
+                                border: '1px solid #aaaa00',
+                                borderRadius: '5px',
+                            }}>
+                                <IconParticipants />&nbsp;
+                                {despesa.participants.length}
+                            </span>x
+                            <span style={{
+                                fontSize: '1.1em',
+                                color: '#000',
+                                padding: '5px',
+                                border: '1px solid #aaaa00',
+                                borderRadius: '5px',
+                            }}>
+                                <IconDespesa />&nbsp;
+                                {(despesa.quantia / despesa.participants.length).toFixed(2)}
+                                €
+                            </span>
+
+
                         </span>
-                        <span style={{ fontSize: '0.7em', backgroundColor: '#888', border: '3px solid #555', borderRadius: '5px' }}>
-                            👥&nbsp;
-                            {despesa.participants.length}
-                            &nbsp;x&nbsp;
-                            {(despesa.quantia / despesa.participants.length).toFixed(2)}
-                        </span>
-                        <span style={{ fontSize: '0.7em', backgroundColor: '#888', border: '3px solid #555', borderRadius: '5px' }}>
-                            📅&nbsp;&nbsp;{despesa.createdAt.toDate().toLocaleString('ca-ES')}
-                        </span>
+
+
                     </div>
                     <div className="despesa-line">
                         <button onClick={() => setDespesaActiva(despesa.id)} style={{ backgroundColor: 'rgba(146, 112, 209, 0.4)', color: '#c5c5c5' }}>
@@ -119,16 +190,25 @@ export default function DespesesLlista({ despeses, eliminarDespesa, projecte }) 
             ))}
 
             {despesaActiva && (
-                <Modal handleTancar={() => setDespesaActiva(null)} esVorera={""} title={`detalls de la despesa '${despesaActivaEdit.concepte}'`}>
+                <Modal handleTancar={() => setDespesaActiva(null)}
+                    esVorera={""}
+                    title={`detalls de la despesa '${despesaActiva.concepte}'`}>
                     <DespesesDetall id={despesaActiva} />
                 </Modal>
             )}
             {despesaActivaEdit && (
-                <Modal handleTancar={() => setDespesaActivaEdit(null)} esVorera={""} title={`editant la despesa '${despesaActivaEdit.concepte}'`}>
-                    <DespesaForm despesa={despesaActivaEdit}
+                <Modal handleTancar={() => setDespesaActivaEdit(null)}
+                    esVorera={""}
+                    title={`editant la despesa '${despesaActivaEdit.concepte}'`}>
+                    {console.log(updateDespesa)}
+                    <DespesaForm
+                        despesa={despesaActivaEdit}
                         usuariAutenticat={getAuth().currentUser?.uid}
                         projecte={projecte}
-                        actualitzarDespesa={updateDespesa} />
+                        actualitzarDespesa={updateDespesa} 
+                        
+                        onSuccess={() => setDespesaActivaEdit(null)} // ✅ tanca el modal correctament
+                        />
 
                     {/*<DespesaForm 
                         afegirDespesa={afegirDespesa}  

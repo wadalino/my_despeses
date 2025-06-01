@@ -2,17 +2,22 @@ import { useState, useEffect } from 'react';
 import '../despesaForm/DespesaForm.css';
 import useCollection from '../../hooks/useCollection'; // ajusta la ruta si cal
 import ParticipantSelector from '../participants/ParticipantSelector';
+// import ProjectesParticipants from './ProjecteParticipants';
+import IconParticipants from '../../icons/iconParticipants';
+import IconDespesa from '../../icons/iconDespesa';
 
 export default function ProjecteForm({ 
   user, 
   afegirProjecte, 
   actualitzarProjecte, // actualitzarProjecte no s'utilitza
-  projecte 
+  projecte,
+  onSuccess,
+  onUpdate,
 }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [owner, setOwner] = useState('');
-  const [participants, setParticipants] = useState([]);
+  const [participants, setParticipants] = useState(projecte?.participants || [usuariAutenticat?.owner]);
   const allParticipantsProject = projecte?.participants;
 
   const { documents: allParticipants, loading } = useCollection('participants');
@@ -23,7 +28,7 @@ export default function ProjecteForm({
       setName(projecte.name || '');
       setDescription(projecte.description || '');
       setOwner(projecte.owner || user?.uid || '');
-      setParticipants(projecte.participants || [user?.uid] || []);
+      setParticipants(projecte?.participants || [user?.uid] || []);
     } else {
       resetForm();
     }
@@ -46,16 +51,20 @@ export default function ProjecteForm({
       participants,
       modified: new Date(),
     };
-
+    console.log("hola");
     if (projecte?.id) {
-      // Si el projecte existeix, actualitza
+      // Actualitza projecte existent
       actualitzarProjecte(projecte.id, newProjecte);
+      
     } else {
-      // Si no, crea un de nou
+      // Afegeix un nou projecte
       afegirProjecte(newProjecte);
     }
     resetForm();
+    onSuccess();
+    
   };
+
 
   const handleParticipantsChange = (selected) => {
     setParticipants();
@@ -102,13 +111,28 @@ export default function ProjecteForm({
         </select>
       </label>
       */}
-
-      <ParticipantSelector
-                participantsRef={allParticipants}
-                projectParticipants={allParticipantsProject}
-                selected={participants}
-                onChange={handleParticipantsChange}
-              />
+      <label className='bordered'>
+        <h4>Participants&nbsp;&nbsp;&nbsp;
+          <small><IconParticipants/> {allParticipantsProject?.length} &nbsp; &nbsp;
+                  {/*<IconDespesa/> {((quantia/participantsDespesa.length).toFixed(2))}€*/}
+          </small>
+        </h4>
+        <ParticipantSelector
+                  participantsRef={allParticipants}
+                  projectParticipants={allParticipantsProject}
+                  selected={allParticipantsProject}
+                  onChange={handleParticipantsChange}
+                />
+      </label>
+      
+      {/*
+      <ProjectesParticipants
+                  participants={participants}
+                  onUpdateParticipants={async (newList) => {
+                    participants = newList;
+                  }}
+                />        
+      */}
       <button type='submit' disabled={loading}>
         {projecte?.id ? 'Actualitzar' : 'Afegir'}
       </button>

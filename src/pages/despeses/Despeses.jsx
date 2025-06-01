@@ -51,7 +51,7 @@ export default function Despeses(props) {
             });
         setMostraModal(false);
     };
-
+    
     const eliminarDespesa = (id) => {
         deleteDespesa(id);
     }

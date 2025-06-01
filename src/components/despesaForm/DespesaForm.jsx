@@ -3,6 +3,8 @@ import './DespesaForm.css';
 import useCollection from '../../hooks/useCollection';
 import ParticipantSelector from '../participants/ParticipantSelector';
 import { getUserId } from '../../firebase/firebase.js';
+import IconParticipants from '../../icons/iconParticipants.jsx';
+import IconDespesa from '../../icons/iconDespesa.jsx';
 
 export default function DespesaForm({ 
   usuariAutenticat, 
@@ -11,45 +13,50 @@ export default function DespesaForm({
   despesa,
   projecte
 }) {
-  console.log("UsuariAutenticat: ", usuariAutenticat);
+  //console.log("UsuariAutenticat: ", usuariAutenticat);
   const projecteId = projecte?.id || null;
   const { documents: allParticipants, loading } = useCollection('participants');
   const allParticipantsProject = projecte?.participants;
 
   // 🔹 Estados iniciales
   const [concepte, setConcepte] = useState('');
-  const [quantia, setQuantia] = useState('');
+  const [quantia, setQuantia] = useState(despesa?.quantia ?? 0 );
   const [pagatPer, setPagatPer] = useState(usuariAutenticat?.owner || '');
-  const [participants, setParticipants] = useState([usuariAutenticat?.owner] || []);
+  const [participantsDespesa, setParticipantsDespesa] = useState(despesa?.participants ?? [{id: usuariAutenticat?.owner}]);
 
   // 🔥 Solo actualizar campos si estamos editando
   useEffect(() => {
-    console.log("handleSubmit executat", { concepte, quantia, pagatPer, participants });
-
+    console.log("handleSubmit executat", { concepte, quantia, pagatPer, participantsDespesa });
     if (despesa) {
+      console.log("Despeses Form set despesa to update", despesa);
       setConcepte(despesa.concepte ?? '');
       setQuantia(despesa.quantia?.toString() ?? '');
       setPagatPer(despesa.pagatPer ?? usuariAutenticat?.owner ?? '');
-      setParticipants(despesa.participants ?? []);
+      setParticipantsDespesa(despesa.participants ?? [usuariAutenticat?.owner]);
     } else {
       // 🔹 Solo para añadir, aseguramos que se inicialice correctamente
       setPagatPer(usuariAutenticat?.owner || '');
-      setParticipants([usuariAutenticat?.owner] || []);
+      setParticipantsDespesa([{id: usuariAutenticat?.owner}] || []);
     }
   }, [despesa, usuariAutenticat]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("ProjecteForm handleSubmit", { e });
+    console.log("REVISAR UPDATE!!!!!!!!! AÑADADIR OK!");
 
-    if (!concepte.trim() || !quantia || !pagatPer || participants.length === 0) {
+    if (!concepte.trim() || !quantia || !pagatPer || participantsDespesa.length === 0) {      
       alert('Tots els camps són obligatoris.');
       return;
     }
 
+    console.log('DespesaForm', concepte, quantia, pagatPer, participantsDespesa);
     const uid = getUserId();
-    const participantsFinal = uid && !participants.includes(uid)
-      ? [...participants, uid]
-      : participants;
+    const participantsFinal = 
+      uid && !participantsDespesa.some(p => p.id === uid)
+        ? [...participantsDespesa, {id: uid}]
+        : participantsDespesa;
+      
 
     const novaDespesa = {
       projecteId,
@@ -60,20 +67,32 @@ export default function DespesaForm({
       createdAt: new Date(),
     };
 
+    
     if (despesa) {
+      console.log("DespesaForm OLD despesa:", despesa.id);
+      console.log("DespesaForm Actualitzam NOVA despesa:", novaDespesa);
       actualitzarDespesa({ despesa, novaDespesa });
+      console.log("DespesaForm actualitzarDespesa ejecutado");
+      if (typeof onSuccess === 'function') {
+        onSuccess(); // ← afegeix això per avisar el pare
+      }
     } else {
+      console.log("DespesaForm NOT(old) despesa:", novaDespesa);
+      
       afegirDespesa(novaDespesa);
+      console.log("DespesaForm afegirDespesa ejecutado");
       // 🔥 Al añadir, reseteamos con el user actual como pagador
       setConcepte('');
-      setQuantia('');
+      setQuantia('0');
       setPagatPer(usuariAutenticat?.owner || '');
-      setParticipants([usuariAutenticat?.owner] || []);
+      setParticipantsDespesa([{id: usuariAutenticat?.owner}] || []);
+      // FIXME hay que hacer hande de onsubmit en el principal?
     }
   };
 
   const handleParticipantsChange = (nousParticipants) => {
-    setParticipants(nousParticipants);
+    console.log("DespesaForm -> handleParticipantsChange: ", nousParticipants);
+    setParticipantsDespesa(nousParticipants);
   };
 
   if (loading) return <p>Carregant participants...</p>;
@@ -122,18 +141,22 @@ export default function DespesaForm({
       </label>
 
       <label className='bordered'>
-        <h4>Participants</h4>
-        {console.log('Participants inline', participants)}
+        <h4>Participants&nbsp;&nbsp;&nbsp;
+          <small><IconParticipants/> {participantsDespesa.length} &nbsp; &nbsp;
+                 <IconDespesa/> {((quantia/participantsDespesa.length).toFixed(2))}€</small>
+        </h4>
+        {console.log('Participants inline', participantsDespesa)}
         <ParticipantSelector
           participantsRef={allParticipants}
           projectParticipants={allParticipantsProject}
-          selected={participants}
+          selected={participantsDespesa}
           onChange={handleParticipantsChange}
+          mostrarPagament={true}
         />
       </label>
 
       <button type="submit">
-        {despesa ? 'Actualitzar' : 'Afegir'}
+        {despesa ? (`Actualitzar`) : 'Afegir'}
       </button>
     </form>
   );

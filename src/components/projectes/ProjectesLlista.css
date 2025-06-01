@@ -25,3 +25,67 @@
 .projecte-detall__item {
   color: #bbb;
 }
+
+/* focus visual temporal */
+.projecte-focus {
+  /*background-color: rgba(173, 139, 0, 0.3) !important;*/
+  animation: flash 0.4s ease-in-out;
+}
+
+@keyframes flash {
+  0% { background-color: rgba(255, 255, 0, 0.5); }
+  50% { background-color: transparent; }
+  100% { background-color: rgba(255, 255, 0, 0.5); }
+}
+
+
+.projecte-line {
+  padding:4px;
+  
+}
+.projecte-line span {
+   color: #000;
+   padding: 0.5em;
+   margin: 0.2em;
+}
+
+.projecte-llista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.projectes-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.projecte-label {
+  background-color: #383434;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 0.9rem;
+  color: #bbbbbb;
+}
+
+.projecte-label:hover {
+  background-color: #5c5c5c;
+}
+
+.projecte-label .despeses {
+  font-size: 0.8em;
+  color: #778fdb;
+  margin-left: 0.4rem;
+}
+
+.projecte-label .participants {
+  font-size: 0.8em;
+  color: rgb(189, 103, 211);
+  margin-left: 0.4rem;
+}

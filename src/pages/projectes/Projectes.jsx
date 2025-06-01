@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, deleteProjecte, saveProjecte } from '../../firebase/firebase.js';
+import { auth, deleteProjecte, updateProjecte, saveProjecte } from '../../firebase/firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCollection } from '../../hooks/useCollection.jsx';
 import ProjectesLlista from '../../components/projectes/ProjectesLlista.jsx';
@@ -36,24 +36,28 @@ export default function Projectes() {
   return (
     <div className="div-projectes">
       <h2>Els meus projectes</h2>
-
+      <button onClick={() => setMostraModal(true)}>Afegir Projecte Nou</button>
       {projectesDelUsuari.length === 0 ? (
         <h3>Encara no tens projectes!!</h3>
+        
       ) : (
+        
         <ProjectesLlista 
           eliminarProjecte={deleteProjecte} 
           projectes={projectesDelUsuari} 
         />
       )}
 
-      <button onClick={() => setMostraModal(true)}>Afegir Projecte Nou</button>
+      
 
       {mostraModal && (
         <Modal handleTancar={() => setMostraModal(false)} esVorera={""} title="Afegint un nou Projecte">
           <ProjecteForm 
             user={user}   
             afegirProjecte={saveProjecte}
+            actualitzarProjecte={updateProjecte}  // assegura’t que ho passes si és editable
             eliminarProjecte={deleteProjecte}
+            onSuccess={() => setMostraModal(false)}  // afegeix això
           />
         </Modal>
       )}

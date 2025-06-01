@@ -1,0 +1,12 @@
+.custom-badge {
+  display: inline-block;
+  min-width: 20px;
+  padding: 2px 2px;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: rgb(189, 184, 184);
+  background-color: rgb(114, 6, 6);
+  border-radius: 999px;
+  text-align: center;
+  vertical-align: middle;
+}

@@ -66,23 +66,32 @@ export const onGetProjecte = (id, callback) =>
   onSnapshot(doc(db, "projectes", id), callback);
 
 export const saveProjecte = async (projecte) => {
-  //console.log(projecte);
-  const docRef = await addDoc(collection(db, "projectes"), projecte);
-  return docRef.id;   
-}
+  const projecteAmbTimestamp = {
+    ...projecte,
+    created: serverTimestamp(), // afegeix data i hora del servidor
+  };
 
-export const updateProjecte = async (projecte) => {
-  const projecteId = projecte.id ?? null;
+  const docRef = await addDoc(collection(db, "projectes"), projecteAmbTimestamp);
+  return docRef.id;
+};
+
+export const updateProjecte = async (projecteOld, projecteNew) => {
+  console.log("Firebase update project", projecteOld);
+  const projecteId = projecteOld?.id || projecteOld || null;
   if (!projecteId) return false;
 
   try {
     const docRef = doc(db, 'projectes', projecteId);
-    await updateDoc(docRef, projecte);
-    return docRef.id;
+    await updateDoc(docRef, projecteNew);
+    console.log("Projecte actualitzat correctament: ", projecteId);
+    //return docRef.id;
+    return true;
   } catch (error) {
-    console.error("Error actualitzant el projecte:", error);
+    console.error("Error actualitzant el projecte: ", error);
     return false;
   }
+
+  
 };
 
 export const deleteProjecte = async (id) => {
@@ -212,7 +221,7 @@ export const getUserId = () => {
 
 export const getUserEmail = () => {
   const user = getCurrentUser();
-  console.log("From Firebase getUserId: ", user);
+  // console.log("From Firebase getUserId: ", user);
   return user ? user.email : null;
 }
 
