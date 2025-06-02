@@ -84,7 +84,7 @@ export const onGetProjecte = (id, callback) =>
 export const saveProjecte = async (projecte) => {
   const projecteAmbTimestamp = {
     ...projecte,
-    created: serverTimestamp(), //  afegeix data i hora del servidor
+    created: serverTimestamp(), // afegeix data i hora del servidor
   };
 
   const docRef = await addDoc(collection(db, "projectes"), projecteAmbTimestamp);
