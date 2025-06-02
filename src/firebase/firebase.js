@@ -2,7 +2,10 @@ import { firebaseConfig } from "./config"
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
-import { getFirestore, addDoc, collection, getDoc, getDocs, onSnapshot, doc, deleteDoc, updateDoc } from "firebase/firestore"
+import { getFirestore, addDoc, collection, 
+  doc, getDoc, getDocs, onSnapshot, 
+  deleteDoc, updateDoc,
+  serverTimestamp } from "firebase/firestore"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth'; 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -27,10 +30,23 @@ export const saveCollection = async (collectionName, document) => {
 /* DESPESA FUNCTIONS */
 export const saveDespesa = async (despesa) => {
   console.log(despesa);
-  const docRef = await addDoc(collection(db, "despeses"), despesa);
+  try {
+    // Afegim un timestamp al document
+    const despesaAmbTimestamp = {
+      ...despesa,
+      created: serverTimestamp(), // afegeix data i hora del servidor
+    };
 
-  return docRef.id;   
+    // Guardar la despesa a la col·lecció "despeses"
+    const docRef = await addDoc(collection(db, "despeses"), despesaAmbTimestamp);
+    return docRef.id;
+  }
+  catch (error) {
+    console.error("Error guardant la despesa:", error);
+    throw error; // Llença l'error per manejar-lo a nivell superior si cal
+  } 
 }
+
 export const getDespeses = () => 
   getDocs(collection(db, "despeses"));
 
@@ -81,16 +97,19 @@ export const updateProjecte = async (projecteOld, projecteNew) => {
   if (!projecteId) return false;
 
   try {
+    const projecteNewAmbModifiedTimestamp = {
+      ...projecteNew,
+      modified: serverTimestamp(), // afegeix data i hora del servidor
+    };
     const docRef = doc(db, 'projectes', projecteId);
-    await updateDoc(docRef, projecteNew);
+    await updateDoc(docRef, projecteNewAmbModifiedTimestamp);
     console.log("Projecte actualitzat correctament: ", projecteId);
-    //return docRef.id;
-    return true;
+    return docRef.id;
+    //return true;
   } catch (error) {
     console.error("Error actualitzant el projecte: ", error);
     return false;
   }
-
   
 };
 

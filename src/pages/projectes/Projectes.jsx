@@ -39,7 +39,6 @@ export default function Projectes() {
       <button onClick={() => setMostraModal(true)}>Afegir Projecte Nou</button>
       {projectesDelUsuari.length === 0 ? (
         <h3>Encara no tens projectes!!</h3>
-        
       ) : (
         
         <ProjectesLlista 

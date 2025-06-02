@@ -12,14 +12,19 @@ export default function ProjecteForm({
   actualitzarProjecte, // actualitzarProjecte no s'utilitza
   projecte,
   onSuccess,
-  onUpdate,
+  //onUpdate,
 }) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [owner, setOwner] = useState('');
-  const [participants, setParticipants] = useState(projecte?.participants || [usuariAutenticat?.owner]);
+  // Si no hi ha projecte, per defecte posem un objecte buit
+  const [name, setName] = useState(projecte?.name || '');
+  // Descripció inicial:
+  const [description, setDescription] = useState(projecte?.description || '');
+  // Owner inicial:
+  const [owner, setOwner] = useState(projecte?.owner || user?.uid || ''); // per defecte posem el user?.uid
+  // Participants inicials:
+  // si no hi ha projecte, per defecte posem el user?.uid
+  const [participants, setParticipants] = useState(projecte?.participants || [user?.uid]);
+  // Participants del projecte
   const allParticipantsProject = projecte?.participants;
-
   const { documents: allParticipants, loading } = useCollection('participants');
 
   // Si hi ha projecte, carrega les dades per editar
@@ -28,7 +33,7 @@ export default function ProjecteForm({
       setName(projecte.name || '');
       setDescription(projecte.description || '');
       setOwner(projecte.owner || user?.uid || '');
-      setParticipants(projecte?.participants || [user?.uid] || []);
+      setParticipants(projecte?.participants || [user?.uid]);
     } else {
       resetForm();
     }
@@ -37,8 +42,8 @@ export default function ProjecteForm({
   const resetForm = () => {
     setName('');
     setDescription('');
-    setOwner(user?.uid || ''); // per defecte posem el user?.uid
-    setParticipants(user?.uid ? [user.uid] : []);
+    setOwner(user?.uid ?? ''); // per defecte posem el user?.uid
+    setParticipants([user?.uid] ?? []);
   };
 
   const handleSubmit = (e) => {
@@ -49,9 +54,8 @@ export default function ProjecteForm({
       description,
       owner,
       participants,
-      modified: new Date(),
+      // modified in set in firebase.js
     };
-    console.log("hola");
     if (projecte?.id) {
       // Actualitza projecte existent
       actualitzarProjecte(projecte.id, newProjecte);
@@ -66,7 +70,7 @@ export default function ProjecteForm({
   };
 
 
-  const handleParticipantsChange = (selected) => {
+  const handleParticipantsChange = (participants) => {
     setParticipants();
   };
 
@@ -120,7 +124,7 @@ export default function ProjecteForm({
         <ParticipantSelector
                   participantsRef={allParticipants}
                   projectParticipants={allParticipantsProject}
-                  selected={allParticipantsProject}
+                  selected={participants}
                   onChange={handleParticipantsChange}
                 />
       </label>
@@ -134,7 +138,7 @@ export default function ProjecteForm({
                 />        
       */}
       <button type='submit' disabled={loading}>
-        {projecte?.id ? 'Actualitzar' : 'Afegir'}
+        {projecte?.id ? 'Actualitzar' : 'Afegir nou projecte'}
       </button>
     </form>
   );
