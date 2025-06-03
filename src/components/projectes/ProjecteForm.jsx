@@ -59,19 +59,27 @@ export default function ProjecteForm({
     if (projecte?.id) {
       // Actualitza projecte existent
       actualitzarProjecte(projecte.id, newProjecte);
-      
+      // tancam el modal
+      resetForm();
+      onSuccess();
     } else {
       // Afegeix un nou projecte
       afegirProjecte(newProjecte);
+      resetForm();
+      // tancam el modal
+      onSuccess();
     }
-    resetForm();
-    onSuccess();
+    
+    // onSuccess();
     
   };
 
 
+
+
   const handleParticipantsChange = (participants) => {
-    setParticipants();
+    setParticipants(participants);
+    //console.log("Participants actualitzats:", participants);
   };
 
   return (
@@ -116,11 +124,7 @@ export default function ProjecteForm({
       </label>
       */}
       <label className='bordered'>
-        <h4>Participants&nbsp;&nbsp;&nbsp;
-          <small><IconParticipants/> {allParticipantsProject?.length} &nbsp; &nbsp;
-                  {/*<IconDespesa/> {((quantia/participantsDespesa.length).toFixed(2))}€*/}
-          </small>
-        </h4>
+        
         <ParticipantSelector
                   participantsRef={allParticipants}
                   projectParticipants={allParticipantsProject}

@@ -1,12 +1,50 @@
 .participants-wrapper {
+  margin: 0;
+  padding: 0;
+}
+
+.participants-wrapper-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.5rem 0;
   position: relative;
-  max-width: 500px;
   overflow: auto;
   max-height:200px;
+  margin: -20px -1rem 10px -1rem;
+  padding: 0.5em;
+  max-width: 800px;
+  background-color: rgba(85, 129, 48, 0.4);
+}
+
+.participants-wrapper-posibles {
+  margin: 0;
+  padding: 0;
+}
+
+.participants-wrapper-posibles h4, .participants-wrapper h4 {
+  margin-top: -20px;
+  color: #a3a3a3;
+  font-size: 1.1rem;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-color: rgba(18, 95, 105, 0.7);
+}
+.participants-wrapper h4 {
+  margin-top: -10px;
+  background-color: rgba(85, 129, 48, 0.4);
+}
+
+.participants-wrapper-posibles-list {
+  margin: -20px -1rem 10px -1rem;
+  padding: 0.5em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  position: relative;
+  max-width: 800px;
+  overflow: auto;
+  max-height:100px;
+  background-color: rgba(18, 95, 105, 0.4);
 }
 
 .participant-tag.manual {
@@ -72,3 +110,4 @@
 .suggestions-list li:hover {
   background-color: rgb(105, 13, 128);
 }
+

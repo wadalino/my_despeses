@@ -206,7 +206,6 @@ export default function DespesesLlista({ despeses, eliminarDespesa, projecte }) 
                         usuariAutenticat={getAuth().currentUser?.uid}
                         projecte={projecte}
                         actualitzarDespesa={updateDespesa} 
-                        
                         onSuccess={() => setDespesaActivaEdit(null)} // ✅ tanca el modal correctament
                         />
 

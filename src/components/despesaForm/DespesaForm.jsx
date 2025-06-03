@@ -11,7 +11,8 @@ export default function DespesaForm({
   afegirDespesa, 
   actualitzarDespesa,
   despesa,
-  projecte
+  projecte,
+  onSuccess,
 }) {
   //console.log("UsuariAutenticat: ", usuariAutenticat);
   const projecteId = projecte?.id || null;
@@ -26,9 +27,9 @@ export default function DespesaForm({
 
   // 🔥 Solo actualizar campos si estamos editando
   useEffect(() => {
-    console.log("handleSubmit executat", { concepte, quantia, pagatPer, participantsDespesa });
+    // console.log("handleSubmit executat", { concepte, quantia, pagatPer, participantsDespesa });
     if (despesa) {
-      console.log("Despeses Form set despesa to update", despesa);
+      // console.log("Despeses Form set despesa to update", despesa);
       setConcepte(despesa.concepte ?? '');
       setQuantia(despesa.quantia?.toString() ?? '');
       setPagatPer(despesa.pagatPer ?? usuariAutenticat?.owner ?? '');
@@ -50,7 +51,7 @@ export default function DespesaForm({
       return;
     }
 
-    console.log('DespesaForm', concepte, quantia, pagatPer, participantsDespesa);
+    // console.log('DespesaForm', concepte, quantia, pagatPer, participantsDespesa);
     const uid = getUserId();
     const participantsFinal = 
       uid && !participantsDespesa.some(p => p.id === uid)
@@ -69,13 +70,11 @@ export default function DespesaForm({
 
     
     if (despesa) {
-      console.log("DespesaForm OLD despesa:", despesa.id);
-      console.log("DespesaForm Actualitzam NOVA despesa:", novaDespesa);
-      actualitzarDespesa({ despesa, novaDespesa });
+      // console.log("DespesaForm OLD despesa:", despesa.id);
+      // console.log("DespesaForm Actualitzam NOVA despesa:", novaDespesa);
+      actualitzarDespesa(despesa, novaDespesa);
       console.log("DespesaForm actualitzarDespesa ejecutado");
-      if (typeof onSuccess === 'function') {
-        onSuccess(); // ← afegeix això per avisar el pare
-      }
+      onSuccess(); // ← afegeix això per avisar el pare
     } else {
       console.log("DespesaForm NOT(old) despesa:", novaDespesa);
       
@@ -145,7 +144,6 @@ export default function DespesaForm({
           <small><IconParticipants/> {participantsDespesa.length} &nbsp; &nbsp;
                  <IconDespesa/> {((quantia/participantsDespesa.length).toFixed(2))}€</small>
         </h4>
-        {console.log('Participants inline', participantsDespesa)}
         <ParticipantSelector
           participantsRef={allParticipants}
           projectParticipants={allParticipantsProject}

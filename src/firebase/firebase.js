@@ -57,12 +57,13 @@ export const onGetDespesa = (id, callback) =>
   onSnapshot(doc(db, "despeses", id), callback);
 
 export const updateDespesa = async (despesa, novaDespesa) => {
+  //console.log("Updating despesa:", despesa, "with new data:", novaDespesa);
   const despesaId = despesa.id ?? null;
   if (!despesaId) return false;
-
   try {
-    const docRef = doc(db, 'despesas', despesaId);
+    const docRef = doc(db, 'despeses', despesaId);
     await updateDoc(docRef, novaDespesa);
+    console.log("Despesa actualitzada correctament:", despesaId);
     return docRef.id;
   } catch (error) {
     console.error("Error actualitzant la despesa:", error);
@@ -71,6 +72,7 @@ export const updateDespesa = async (despesa, novaDespesa) => {
 };
 
 export const deleteDespesa = async (id) => {
+  console.log("Deleting despesa with id:", id);
   deleteDoc(doc(db, "despeses", id));
 }
 
@@ -82,12 +84,15 @@ export const onGetProjecte = (id, callback) =>
   onSnapshot(doc(db, "projectes", id), callback);
 
 export const saveProjecte = async (projecte) => {
+  if (!projecte || !projecte.name) {
+    return false;
+  }
   const projecteAmbTimestamp = {
     ...projecte,
     created: serverTimestamp(), // afegeix data i hora del servidor
   };
-
-  const docRef = await addDoc(collection(db, "projectes"), projecteAmbTimestamp);
+  //console.log("Firebase save project", projecteAmbTimestamp);
+  const docRef = await saveCollection("projectes", projecteAmbTimestamp);
   return docRef.id;
 };
 

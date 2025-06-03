@@ -6,6 +6,7 @@ import Modal from '../modal/Modal';
 import ProjectesDetall from './ProjectesDetall';
 import ProjecteForm from './ProjecteForm';
 import ProjectesParticipants from './ProjecteParticipants';
+import ProjecteParticipants from './ProjecteParticipants';
 import DespesesLlista from '../despesesLlista/DespesesLlista';
 import Despeses from '../../pages/despeses/Despeses';
 
@@ -172,8 +173,9 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
 
       {projecteActiuParticipants && (
         <Modal handleTancar={() => setProjecteActiuParticipants(null)} esVorera={""} title={`participants del projecte '${projecteActiuParticipants.name}'`}>
-          <ProjectesParticipants
-            participants={projecteActiuParticipants.participants}
+          <ProjecteParticipants
+            projecte={projecteActiuParticipants}
+            user={user}
             onUpdateParticipants={async (newList) => {
               try {
                 await updateProjecteParticipants(projecteActiuParticipants.id, newList);
@@ -191,8 +193,12 @@ export default function ProjectesLlista({ projectes, eliminarProjecte }) {
       )}
 
       {projecteActiuEdit && (
-        <Modal handleTancar={() => setProjecteActiuEdit(null)} esVorera={""} title={`editant projecte '${projecteActiuEdit.name}'`}>
-          <ProjecteForm projecte={projecteActiuEdit} actualitzarProjecte={updateProjecte} />
+        <Modal modalNameClass="modalDespeses" handleTancar={() => setProjecteActiuEdit(null)} esVorera={""} title={`editant projecte '${projecteActiuEdit.name}'`}>
+          <ProjecteForm 
+              projecte={projecteActiuEdit} 
+              actualitzarProjecte={updateProjecte} 
+              onSuccess={() => setProjecteActiuEdit(null)}  
+              />
         </Modal>
       )}
 
